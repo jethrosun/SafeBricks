@@ -3,6 +3,7 @@ source ./config.sh
 set -e
 
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
+echo $BASE_DIR
 BUILD_SCRIPT=$( basename "$0" )
 
 if [[ -z ${CARGO_INCREMENTAL} ]] || [[ $CARGO_INCREMENTAL = false ]] || [[ $CARGO_INCREMENTAL = 0 ]]; then
@@ -16,8 +17,8 @@ fi
 echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
 echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
 
-DPDK_VER=17.08
-DPDK_HOME="/opt/dpdk/dpdk-stable-${DPDK_VER}"
+DPDK_VER=17.08.1
+DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
 DPDK_LD_PATH="${DPDK_HOME}/build/lib"
 DPDK_CONFIG_FILE=${DPDK_CONFIG_FILE-"${DPDK_HOME}/config/common_linuxapp"}
 
@@ -34,18 +35,18 @@ native
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly build
+    cargo +nightly-2019-05-22 build
 else
-    cargo +nightly build --release
+    cargo +nightly-2019-05-22 build --release
 fi
 popd
 
 # Build custom runner
 pushd sgx-runner
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly build
+    cargo +nightly-2019-05-22 build
 else
-    cargo +nightly build --release
+    cargo +nightly-2019-05-22 build --release
 fi
 popd
 
@@ -57,9 +58,9 @@ do
 	# Build enclave APP
 	pushd examples/$TASK
 	if [ "$MODE" == "debug" ]; then
-	    cargo +nightly build --target=x86_64-fortanix-unknown-sgx
+	    cargo +nightly-2019-05-22 build --target=x86_64-fortanix-unknown-sgx
 	else
-	    cargo +nightly build --target=x86_64-fortanix-unknown-sgx --release
+	    cargo +nightly-2019-05-22 build --target=x86_64-fortanix-unknown-sgx --release
 	fi
 	popd
 

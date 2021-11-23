@@ -1,12 +1,12 @@
 #!/bin/bash
-
+set -e
 
 #sudo bash ../utils/vm-kernel-upgrade.sh
 #require rebooting
 
 #sudo bash ../utils/vm-setup.sh
 
-DPDK_HOME=~/tools/dpdk-stable-17.08.1
+DPDK_HOME=~/dev/tools/dpdk-stable-17.08.1
 
 # add -DHG_MON=1 if you want dpdk to print memzone info.
 CFLAGS="-g3 -Wno-error=maybe-uninitialized -fPIC"
@@ -35,16 +35,16 @@ build_dpdk_normal () {
     fi
 }
 
-cd ~/tools
+cd ~/dev/tools
 # build_dpdk_hugepage_mon
 build_dpdk_normal
 
 
-cp ~/utils/dpdk/common_linuxapp-17.08 $DPDK_HOME/config/common_linuxapp
+cp ~/dev/utils/dpdk/common_linuxapp-17.08 $DPDK_HOME/config/common_linuxapp
 
 cd $DPDK_HOME
 
-make clean
+make clean | true
 make config T=x86_64-native-linuxapp-gcc EXTRA_CFLAGS="${CFLAGS}"
 make -j16 EXTRA_CFLAGS="${CFLAGS}"
 sudo make install
@@ -53,10 +53,10 @@ sudo insmod $DPDK_HOME/build/kmod/igb_uio.ko
 
 sudo $DPDK_HOME/usertools/dpdk-devbind.py --force -b igb_uio 0000:02:00.0 0000:02:00.1 0000:02:00.2 0000:02:00.3
 
-bash ~/NetBricks/setupDpdkCopy.sh
+bash ~/dev/SafeBricks/setupDpdkCopy.sh
 
 # hugepages setup on numa node
-echo 2048 | sudo tee /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
-echo 2048 | sudo tee /sys/devices/system/node/node1/hugepages/hugepages-2048kB/nr_hugepages
+# echo 2048 | sudo tee /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
+# echo 2048 | sudo tee /sys/devices/system/node/node1/hugepages/hugepages-2048kB/nr_hugepages
 
-echo "please rebuild NetBricks to make dpdk changes valid"
+echo "please rebuild SafeBricks to make dpdk changes valid"

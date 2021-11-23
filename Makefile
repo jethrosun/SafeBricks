@@ -8,36 +8,36 @@ GH=git@github.com:williamofockham
         init lint native run run-rel test watch watch-test
 
 build:
-	@./build.sh build
+	@./build_sgx_dpdk.sh build
 
 build-all:
-	@./build.sh build_all
+	@./build_sgx_dpdk.sh build_all
 
 build-ex:
 ifdef EXAMPLE
-	@./build.sh build_example $(EXAMPLE)
+	@./build_sgx_dpdk.sh build_example $(EXAMPLE)
 else
-	@./build.sh build_example
+	@./build_sgx_dpdk.sh build_example
 endif
 
 build-nb:
-	@./build.sh build_fmwk
+	@./build_sgx_dpdk.sh build_fmwk
 
 build-rel:
-	@./build.sh build_rel
+	@./build_sgx_dpdk.sh build_rel
 
 build-rel-ex:
 ifdef EXAMPLE
-	@./build.sh build_example_rel $(EXAMPLE)
+	@./build_sgx_dpdk.sh build_example_rel $(EXAMPLE)
 else
-	@./build.sh build_example
+	@./build_sgx_dpdk.sh build_example
 endif
 
 clean:
-	@./build.sh clean
+	@./build_sgx_dpdk.sh clean
 
 fmt:
-	@./build.sh fmt
+	@./build_sgx_dpdk.sh fmt
 
 init:
 	@mkdir -p $(BASE_DIR)/.git/hooks && ln -s -f $(BASE_DIR)/.hooks/pre-commit $(BASE_DIR)/.git/hooks/pre-commit
@@ -46,35 +46,35 @@ init:
 	-git clone --recurse-submodules $(GH)/moongen.git
 
 lint:
-	@./build.sh lint
+	@./build_sgx_dpdk.sh lint
 
 native:
-	@./build.sh build_native
+	@./build_sgx_dpdk.sh build_native
 
 run:
 ifdef EXAMPLE
-	@./build.sh run $(EXAMPLE) -p $(PORT) -c $(CORE) --pool-size=$(POOL_SIZE)
+	@./build_sgx_dpdk.sh run $(EXAMPLE) -p $(PORT) -c $(CORE) --pool-size=$(POOL_SIZE)
 else
-	@./build.sh run
+	@./build_sgx_dpdk.sh run
 endif
 
 run-rel:
 ifdef EXAMPLE
-	@./build.sh run_rel $(EXAMPLE) -p $(PORT) -c $(CORE) --pool-size=$(POOL_SIZE)
+	@./build_sgx_dpdk.sh run_rel $(EXAMPLE) -p $(PORT) -c $(CORE) --pool-size=$(POOL_SIZE)
 else
-	@./build.sh run_rel
+	@./build_sgx_dpdk.sh run_rel
 endif
 
 test:
 ifdef TEST
 	@unset RUST_BACKTRACE
-	@./build.sh build_example $(TEST)
-	@./build.sh test $(TEST)
+	@./build_sgx_dpdk.sh build_example $(TEST)
+	@./build_sgx_dpdk.sh test $(TEST)
 	@export RUST_BACKTRACE=1
 else
 	@unset RUST_BACKTRACE
-	@./build.sh build
-	@./build.sh test
+	@./build_sgx_dpdk.sh build
+	@./build_sgx_dpdk.sh test
 	@export RUST_BACKTRACE=1
 endif
 
