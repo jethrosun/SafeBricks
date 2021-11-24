@@ -22,6 +22,8 @@ DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
 DPDK_LD_PATH="${DPDK_HOME}/build/lib"
 DPDK_CONFIG_FILE=${DPDK_CONFIG_FILE-"${DPDK_HOME}/config/common_linuxapp"}
 
+export RTE_SDK=$HOME/dev/tools/dpdk-stable-17.08.1 # for instance.
+
 NATIVE_LIB_PATH="${BASE_DIR}/native"
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
@@ -35,32 +37,33 @@ native
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly-2019-05-22 build
+    cargo +nightly-2019-12-20 build
 else
-    cargo +nightly-2019-05-22 build --release
+    cargo +nightly-2019-12-20 build --release
 fi
 popd
 
 # Build custom runner
 pushd sgx-runner
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly-2019-05-22 build
+    cargo +nightly-2019-12-20 build
 else
-    cargo +nightly-2019-05-22 build --release
+    cargo +nightly-2019-12-20 build --release
 fi
 popd
 
 # export HYPERSCAN_ROOT=/usr/local
 # for TASK in dpi-hs
-for TASK in acl-fw dpi lpm macswap maglev monitoring nat-tcp-v4 acl-fw-ipsec dpi-ipsec lpm-ipsec macswap-ipsec maglev-ipsec monitoring-ipsec nat-tcp-v4-ipsec acl-fw-ipsec-sha dpi-ipsec-sha lpm-ipsec-sha macswap-ipsec-sha maglev-ipsec-sha monitoring-ipsec-sha nat-tcp-v4-ipsec-sha
+# for TASK in acl-fw dpi lpm macswap maglev monitoring nat-tcp-v4 acl-fw-ipsec dpi-ipsec lpm-ipsec macswap-ipsec maglev-ipsec monitoring-ipsec nat-tcp-v4-ipsec acl-fw-ipsec-sha dpi-ipsec-sha lpm-ipsec-sha macswap-ipsec-sha maglev-ipsec-sha monitoring-ipsec-sha nat-tcp-v4-ipsec-sha
+for TASK in acl-fw 
 do 
 
 	# Build enclave APP
 	pushd examples/$TASK
 	if [ "$MODE" == "debug" ]; then
-	    cargo +nightly-2019-05-22 build --target=x86_64-fortanix-unknown-sgx
+	    cargo +nightly-2019-12-20 build --target=x86_64-fortanix-unknown-sgx
 	else
-	    cargo +nightly-2019-05-22 build --target=x86_64-fortanix-unknown-sgx --release
+	    cargo +nightly-2019-12-20 build --target=x86_64-fortanix-unknown-sgx --release
 	fi
 	popd
 

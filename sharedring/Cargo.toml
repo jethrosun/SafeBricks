@@ -7,3 +7,5 @@ license = "MPL-2.0"
 [dependencies]
 libc = "0.2"
 failure = "0.1"
+rustc-demangle = "=0.1.17"
+backtrace = "=0.3.45"
