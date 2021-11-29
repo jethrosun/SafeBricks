@@ -246,10 +246,14 @@ pub fn aes_gcm128_encrypt_mbedtls(
     //     stdout().flush().unwrap();
     //     return Err(CryptoError::PktlenError);
     // }
-    let hmac: &mut [u8] = &mut [0u8; 16];
+    const TAG_SIZE: usize = 16;
+    let hmac: &mut [u8] = &mut [0u8; TAG_SIZE];
     let aad: &mut [u8] = &mut [0u8; (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)];
     aad[..ESP_HEADER_LENGTH].copy_from_slice(esphdr);
     aad[ESP_HEADER_LENGTH..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)].copy_from_slice(AES_IV);
+
+    output[..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)].copy_from_slice(aad);
+    output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)..].copy_from_slice(hmac);
 
     CIPHER_ENCRY_GCM.with(|cipher| {
         let mut cipher_lived = cipher.borrow_mut();
@@ -258,14 +262,11 @@ pub fn aes_gcm128_encrypt_mbedtls(
                 aad,
                 pktptr,
                 &mut output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)
-                    ..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)],
-                hmac,
+                    ..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen + TAG_SIZE)],
+                TAG_SIZE,
             )
             .unwrap();
     });
-
-    output[..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)].copy_from_slice(aad);
-    output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)..].copy_from_slice(hmac);
 
     Ok(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen + ICV_LEN_GCM128)
 }
@@ -285,9 +286,9 @@ pub fn aes_gcm128_decrypt_mbedtls(
         let mut cipher = cipher.borrow_mut();
         if let Ok(_plain_text) = cipher.decrypt_auth(
             &pktptr[0..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)],
-            &pktptr[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)..(pktlen - ICV_LEN_GCM128)],
+            &pktptr[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)..],
             &mut output[..(pktlen - (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + ICV_LEN_GCM128))],
-            &pktptr[(pktlen - ICV_LEN_GCM128)..],
+            ICV_LEN_GCM128,
         ) {
             let cleartext_len = pktlen - ESP_HEADER_LENGTH - AES_GCM_IV_LENGTH - ICV_LEN_GCM128;
             return Ok(cleartext_len + ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH);
@@ -349,4 +350,3 @@ pub fn set_flow(pkt: &mut [u8], flow: Flow) {
         (*ip_hdr).set_protocol(ProtocolNumbers::Tcp);
     }
 }
-
