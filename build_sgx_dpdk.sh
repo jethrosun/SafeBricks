@@ -42,18 +42,18 @@ native
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly-2019-12-20 build
+    cargo +nightly-2020-05-10 build
 else
-    cargo +nightly-2019-12-20 build --release
+    cargo +nightly-2020-05-10 build --release
 fi
 popd
 
 # Build custom runner
 pushd sgx-runner
 if [ "$MODE" == "debug" ]; then
-    cargo +nightly-2019-12-20 build
+    cargo +nightly-2020-05-10 build
 else
-    cargo +nightly-2019-12-20 build --release
+    cargo +nightly-2020-05-10 build --release
 fi
 popd
 
@@ -66,9 +66,9 @@ do
 	# Build enclave APP
 	pushd examples/$TASK
 	if [ "$MODE" == "debug" ]; then
-	    cargo +nightly-2019-12-20 build --target=x86_64-fortanix-unknown-sgx
+	    cargo +nightly-2020-05-10 build --target=x86_64-fortanix-unknown-sgx
 	else
-	    cargo +nightly-2019-12-20 build --target=x86_64-fortanix-unknown-sgx --release
+	    cargo +nightly-2020-05-10 build --target=x86_64-fortanix-unknown-sgx --release
 	fi
 	popd
 

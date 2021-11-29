@@ -1,4 +1,4 @@
-use std::alloc::{Alloc, Global, Layout};
+use std::alloc::{alloc_zeroed, dealloc, Layout};
 use std::fmt;
 use std::mem::size_of;
 use std::ops::{Deref, DerefMut};
@@ -6,10 +6,9 @@ use std::ptr::{self, NonNull, Unique};
 
 const CACHE_LINE_SIZE: usize = 64;
 unsafe fn allocate_cache_line(size: usize) -> *mut u8 {
-    Global
-        .alloc_zeroed(Layout::from_size_align(size, CACHE_LINE_SIZE).unwrap())
-        .unwrap()
-        .as_ptr() as *mut u8
+    alloc_zeroed(Layout::from_size_align(size, CACHE_LINE_SIZE).unwrap())
+    // .unwrap()
+    // .as_ptr() as *mut u8
 }
 
 pub struct CacheAligned<T: Sized> {
@@ -19,8 +18,8 @@ pub struct CacheAligned<T: Sized> {
 impl<T: Sized> Drop for CacheAligned<T> {
     fn drop(&mut self) {
         unsafe {
-            Global.dealloc(
-                NonNull::<u8>::new_unchecked(self.ptr.as_ptr() as *mut _),
+            dealloc(
+                self.ptr.as_ptr() as *mut u8,
                 Layout::from_size_align(size_of::<T>(), CACHE_LINE_SIZE).unwrap(),
             );
         }

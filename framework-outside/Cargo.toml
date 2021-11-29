@@ -51,5 +51,6 @@ proptest = "0.8.3"
 
 [build-dependencies]
 # Use Bindgen to generate DPDK structures.
-bindgen = "0.49"
+bindgen = "=0.58"
+clang-sys = "=1.0"
 bitflags = "=1.2"
