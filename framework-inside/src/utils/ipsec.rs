@@ -1,5 +1,5 @@
-use mbedtls::cipher::raw::Cipher as CipherMbed;
 use mbedtls::cipher::raw;
+use mbedtls::cipher::raw::Cipher as CipherMbed;
 use mbedtls::cipher::raw::Operation;
 use mbedtls::hash::Md;
 use mbedtls::hash::Type;
@@ -7,14 +7,13 @@ use mbedtls::hash::Type;
 use std::io::stdout;
 use std::io::Write;
 
-use packets::ip::Flow;
 use packets::buffer;
-use packets::TcpHeader;
-use packets::ip::ProtocolNumbers;
 use packets::ip::v4::Ipv4Header;
-use std::net::{IpAddr, Ipv4Addr};
+use packets::ip::Flow;
+use packets::ip::ProtocolNumbers;
+use packets::TcpHeader;
 use std::cell::RefCell;
-
+use std::net::{IpAddr, Ipv4Addr};
 
 #[derive(Debug)]
 pub enum CryptoError {
@@ -70,17 +69,19 @@ thread_local! {
 // pktptr points to the start of the cleartext ip header.
 // after output, output points to the start of the ESP header
 // This function will return outlen: u16
-pub fn aes_cbc_sha256_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut [u8]) -> Result<usize, CryptoError>
-{
+pub fn aes_cbc_sha256_encrypt_mbedtls(
+    pktptr: &[u8],
+    esphdr: &[u8],
+    output: &mut [u8],
+) -> Result<usize, CryptoError> {
     let pktlen = pktptr.len();
 
-    if (pktlen < 16) || (pktlen%16 != 0) {
+    if (pktlen < 16) || (pktlen % 16 != 0) {
         println!("Encrypt: packetlen is not proper");
         stdout().flush().unwrap();
         return Err(CryptoError::PktlenError);
     }
-    if pktlen > (MAX_PKT_SIZE - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256) as usize
-    {
+    if pktlen > (MAX_PKT_SIZE - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256) as usize {
         println!("Packet is too big to handle");
         stdout().flush().unwrap();
         return Err(CryptoError::PktlenError);
@@ -92,7 +93,7 @@ pub fn aes_cbc_sha256_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut
         let mut cipher_lived = cipher.borrow_mut();
         cipher_lived.set_iv(AES_IV).unwrap();
         cipher_lived.set_padding(raw::CipherPadding::None).unwrap();
-   
+
         // let mut cipher_lived = CipherMbed::setup(
         //     raw::CipherId::Aes,
         //     raw::CipherMode::CBC,
@@ -101,14 +102,19 @@ pub fn aes_cbc_sha256_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut
         // cipher_lived.set_key(Operation::Encrypt, AES_KEY).unwrap();
         // cipher_lived.set_iv(AES_IV).unwrap();
         // cipher_lived.set_padding(raw::CipherPadding::None).unwrap();
-   
+
         // In cbc mode, you much have 16 B block size reserverd.
-        if let Ok(ciphertext_len) = cipher_lived.encrypt(pktptr, 
-            &mut output[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH)..(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + 16 + pktlen)])
-        {
-            if ciphertext_len != pktlen
-            {
-                println!("cleartext pktlen: {} vs. ciphertext pktlen: {}", pktptr.len(), ciphertext_len);
+        if let Ok(ciphertext_len) = cipher_lived.encrypt(
+            pktptr,
+            &mut output[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH)
+                ..(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + 16 + pktlen)],
+        ) {
+            if ciphertext_len != pktlen {
+                println!(
+                    "cleartext pktlen: {} vs. ciphertext pktlen: {}",
+                    pktptr.len(),
+                    ciphertext_len
+                );
                 println!("AES encryption errors");
                 stdout().flush().unwrap();
                 return Err(CryptoError::AESEncryptError);
@@ -116,9 +122,16 @@ pub fn aes_cbc_sha256_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut
         }
         let ciphertext_len = pktlen;
         let hmac: &mut [u8] = &mut [0u8; 32];
-        Md::hmac(Type::Sha256, SHA_KEY, &output[..(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ciphertext_len)], hmac).unwrap();
+        Md::hmac(
+            Type::Sha256,
+            SHA_KEY,
+            &output[..(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ciphertext_len)],
+            hmac,
+        )
+        .unwrap();
 
-        output[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ciphertext_len)..].copy_from_slice(&hmac[..ICV_LEN_SHA256]);
+        output[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ciphertext_len)..]
+            .copy_from_slice(&hmac[..ICV_LEN_SHA256]);
         Ok(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ciphertext_len + ICV_LEN_SHA256)
     })
 }
@@ -126,8 +139,11 @@ pub fn aes_cbc_sha256_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut
 // pktptr points to the start of the ESP header
 // after calling, output points to the start of the decrypted ip header.
 // This function will return outlen: u16
-pub fn aes_cbc_sha256_decrypt_mbedtls(pktptr: &[u8], output: &mut [u8], compdigest: bool) -> Result<usize, CryptoError> 
-{
+pub fn aes_cbc_sha256_decrypt_mbedtls(
+    pktptr: &[u8],
+    output: &mut [u8],
+    compdigest: bool,
+) -> Result<usize, CryptoError> {
     let pktlen = pktptr.len();
 
     if pktlen < (ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ICV_LEN_SHA256) {
@@ -136,13 +152,17 @@ pub fn aes_cbc_sha256_decrypt_mbedtls(pktptr: &[u8], output: &mut [u8], compdige
         return Err(CryptoError::PktlenError);
     }
     let hmac: &mut [u8] = &mut [0u8; 32];
-    
-    Md::hmac(Type::Sha256, SHA_KEY, &pktptr[..(pktlen - ICV_LEN_SHA256)], hmac).unwrap();
 
-    if compdigest
-    {
-        if !(&hmac[..ICV_LEN_SHA256] == &pktptr[(pktlen - ICV_LEN_SHA256)..])
-        {
+    Md::hmac(
+        Type::Sha256,
+        SHA_KEY,
+        &pktptr[..(pktlen - ICV_LEN_SHA256)],
+        hmac,
+    )
+    .unwrap();
+
+    if compdigest {
+        if !(&hmac[..ICV_LEN_SHA256] == &pktptr[(pktlen - ICV_LEN_SHA256)..]) {
             println!("INBOUND Mac Mismatch");
             // println!("{:?} vs. {:?}", &hmac[..ICV_LEN_SHA256], &pktptr[(pktlen - ICV_LEN_SHA256)..]);
             stdout().flush().unwrap();
@@ -167,23 +187,26 @@ pub fn aes_cbc_sha256_decrypt_mbedtls(pktptr: &[u8], output: &mut [u8], compdige
         // cipher.set_padding(raw::CipherPadding::None).unwrap();
 
         // In cbc mode, you must have 16 B block size reserverd.
-        // decrypt() does reset() inside. 
-        if let Ok(cleartext_len) = cipher.decrypt(&pktptr[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH)..(pktlen - ICV_LEN_SHA256)],
-            &mut output[..(pktlen - (ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ICV_LEN_SHA256) + 16)])
-        {
-            if cleartext_len != pktlen - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256
-            {
-                println!("ciphertext pktlen: {} vs. cleartext pktlen: {}", pktlen - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256, cleartext_len);
+        // decrypt() does reset() inside.
+        if let Ok(cleartext_len) = cipher.decrypt(
+            &pktptr[(ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH)..(pktlen - ICV_LEN_SHA256)],
+            &mut output[..(pktlen - (ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH + ICV_LEN_SHA256) + 16)],
+        ) {
+            if cleartext_len != pktlen - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256 {
+                println!(
+                    "ciphertext pktlen: {} vs. cleartext pktlen: {}",
+                    pktlen - ESP_HEADER_LENGTH - AES_CBC_IV_LENGTH - ICV_LEN_SHA256,
+                    cleartext_len
+                );
                 println!("AES decryption errors");
                 stdout().flush().unwrap();
                 return Err(CryptoError::AESDecryptError);
             }
             return Ok(cleartext_len + ESP_HEADER_LENGTH + AES_CBC_IV_LENGTH);
         }
-        return Ok(pktlen - ICV_LEN_SHA256);  
+        return Ok(pktlen - ICV_LEN_SHA256);
     })
 }
-
 
 thread_local! {
     pub static CIPHER_ENCRY_GCM: RefCell<CipherMbed> = {
@@ -211,8 +234,11 @@ thread_local! {
     };
 }
 
-pub fn aes_gcm128_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut [u8]) -> Result<usize, CryptoError>
-{
+pub fn aes_gcm128_encrypt_mbedtls(
+    pktptr: &[u8],
+    esphdr: &[u8],
+    output: &mut [u8],
+) -> Result<usize, CryptoError> {
     let pktlen = pktptr.len();
     // if pktlen >(MAX_PKT_SIZE - ESP_HEADER_LENGTH - AES_GCM_IV_LENGTH - ICV_LEN_GCM128) as usize
     // {
@@ -224,22 +250,32 @@ pub fn aes_gcm128_encrypt_mbedtls(pktptr: &[u8], esphdr: &[u8], output: &mut [u8
     let aad: &mut [u8] = &mut [0u8; (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)];
     aad[..ESP_HEADER_LENGTH].copy_from_slice(esphdr);
     aad[ESP_HEADER_LENGTH..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)].copy_from_slice(AES_IV);
-    
+
     CIPHER_ENCRY_GCM.with(|cipher| {
         let mut cipher_lived = cipher.borrow_mut();
-        cipher_lived.encrypt_auth(aad, pktptr, 
-            &mut output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)], hmac).unwrap();
+        cipher_lived
+            .encrypt_auth(
+                aad,
+                pktptr,
+                &mut output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)
+                    ..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)],
+                hmac,
+            )
+            .unwrap();
     });
-    
+
     output[..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)].copy_from_slice(aad);
     output[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen)..].copy_from_slice(hmac);
-    
+
     Ok(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + pktlen + ICV_LEN_GCM128)
 }
 
-pub fn aes_gcm128_decrypt_mbedtls(pktptr: &[u8], output: &mut [u8], compdigest: bool) -> Result<usize, CryptoError>
-{
-    let pktlen = pktptr.len();    
+pub fn aes_gcm128_decrypt_mbedtls(
+    pktptr: &[u8],
+    output: &mut [u8],
+    compdigest: bool,
+) -> Result<usize, CryptoError> {
+    let pktlen = pktptr.len();
     // if pktlen < (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + ICV_LEN_GCM128) {
     //     println!("Decrypt: Packet length is not proper");
     //     stdout().flush().unwrap();
@@ -247,21 +283,21 @@ pub fn aes_gcm128_decrypt_mbedtls(pktptr: &[u8], output: &mut [u8], compdigest: 
     // }
     CIPHER_DECRY_GCM.with(|cipher| {
         let mut cipher = cipher.borrow_mut();
-        if let Ok(_plain_text) = cipher.decrypt_auth(&pktptr[0..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)], &pktptr[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)..(pktlen - ICV_LEN_GCM128)],
-            &mut output[..(pktlen - (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + ICV_LEN_GCM128))], &pktptr[(pktlen - ICV_LEN_GCM128)..])
-        {
+        if let Ok(_plain_text) = cipher.decrypt_auth(
+            &pktptr[0..(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)],
+            &pktptr[(ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH)..(pktlen - ICV_LEN_GCM128)],
+            &mut output[..(pktlen - (ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH + ICV_LEN_GCM128))],
+            &pktptr[(pktlen - ICV_LEN_GCM128)..],
+        ) {
             let cleartext_len = pktlen - ESP_HEADER_LENGTH - AES_GCM_IV_LENGTH - ICV_LEN_GCM128;
             return Ok(cleartext_len + ESP_HEADER_LENGTH + AES_GCM_IV_LENGTH);
         }
-        return Ok(pktlen - ICV_LEN_GCM128);  
+        return Ok(pktlen - ICV_LEN_GCM128);
     })
 }
 
-
-
-
 #[inline]
-pub fn get_flow(pkt: &[u8]) -> Flow{
+pub fn get_flow(pkt: &[u8]) -> Flow {
     unsafe {
         let ip_hdr: *const Ipv4Header = (&pkt[0] as *const u8) as *const Ipv4Header;
         let tcp_hdr: *const TcpHeader = (&pkt[0] as *const u8).offset(20) as *const TcpHeader;
@@ -275,32 +311,33 @@ pub fn get_flow(pkt: &[u8]) -> Flow{
     }
 }
 
-
 #[inline]
-pub fn get_src_ip(pkt: &[u8]) -> Ipv4Addr{
+pub fn get_src_ip(pkt: &[u8]) -> Ipv4Addr {
     unsafe {
         let ip_hdr: *const Ipv4Header = (&pkt[0] as *const u8) as *const Ipv4Header;
         (*ip_hdr).src()
     }
 }
 
-
 #[inline]
-pub fn set_dst_ip(pkt: &mut [u8], dst_ip: u32){
+pub fn set_dst_ip(pkt: &mut [u8], dst_ip: u32) {
     unsafe {
         let ip_hdr: *mut Ipv4Header = (&mut pkt[0] as *mut u8) as *mut Ipv4Header;
-        (*ip_hdr).set_dst(Ipv4Addr::new(((dst_ip >> 24) & 0xFF) as u8,
-             ((dst_ip >> 16) & 0xFF) as u8, ((dst_ip >> 8) & 0xFF) as u8, (dst_ip & 0xFF) as u8));
+        (*ip_hdr).set_dst(Ipv4Addr::new(
+            ((dst_ip >> 24) & 0xFF) as u8,
+            ((dst_ip >> 16) & 0xFF) as u8,
+            ((dst_ip >> 8) & 0xFF) as u8,
+            (dst_ip & 0xFF) as u8,
+        ));
     }
 }
 
-
 #[inline]
-pub fn set_flow(pkt: &mut [u8], flow: Flow){
+pub fn set_flow(pkt: &mut [u8], flow: Flow) {
     unsafe {
         let ip_hdr: *mut Ipv4Header = (&mut pkt[0] as *mut u8) as *mut Ipv4Header;
         let tcp_hdr: *mut TcpHeader = (&mut pkt[0] as *mut u8).offset(20) as *mut TcpHeader;
-        
+
         if let IpAddr::V4(ipv4) = flow.src_ip() {
             (*ip_hdr).set_src(ipv4);
         }
@@ -312,3 +349,4 @@ pub fn set_flow(pkt: &mut [u8], flow: Flow){
         (*ip_hdr).set_protocol(ProtocolNumbers::Tcp);
     }
 }
+

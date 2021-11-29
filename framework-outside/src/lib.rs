@@ -3,6 +3,7 @@
 // Used for cache alignment.
 #![feature(allocator_api)]
 #![feature(asm)]
+#![feature(llvm_asm)]
 #![feature(box_syntax)]
 #![feature(const_fn)]
 // FIXME: Figure out if this is really the right thing here.
@@ -53,6 +54,7 @@ pub mod common;
 pub mod allocators;
 pub mod config;
 pub mod control;
+pub mod heap_ring;
 pub mod interface;
 #[allow(dead_code)]
 pub mod native;
@@ -65,4 +67,4 @@ pub mod shared_state;
 pub mod state;
 pub mod tests;
 pub mod utils;
-pub mod heap_ring;
+

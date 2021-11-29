@@ -57,6 +57,14 @@ host$ ./setupDpdkCopy.sh # in user
 host$ sudo su
 root$ ./setupBuild.sh 
 
+# Get fortanix stuff
+echo "deb https://download.fortanix.com/linux/apt xenial main" | sudo tee -a /etc/apt/sources.list.d/fortanix.list >/dev/null
+curl -sSL "https://download.fortanix.com/linux/apt/fortanix.gpg" | sudo -E apt-key add -
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt-get update
+
 # You should still run everything in user mode
 host$ ./setupBuild.sh
 ```
