@@ -11,8 +11,13 @@ DPDK_HOME=~/dev/tools/dpdk-stable-17.08.1
 # add -DHG_MON=1 if you want dpdk to print memzone info.
 CFLAGS="-g3 -Wno-error=maybe-uninitialized -fPIC"
 
+# clang 3.8
+# export PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/bin/:$PATH
+# export LLVM_CONFIG_PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/bin/llvm-config
+# export LD_LIBRARY_PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/lib
+
 sudo apt-get -y install build-essential ca-certificates curl \
-    libnuma-dev libpcap-dev xz-utils
+    libnuma-dev libpcap-dev xz-utils llvm-3.9-dev libclang-3.9-dev clang-3.9 cmake
 
 # This is used when you want to monitor dpdk hugepage usage during runtime.
 build_dpdk_hugepage_mon () {

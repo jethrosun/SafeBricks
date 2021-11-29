@@ -27,6 +27,11 @@ export RTE_SDK=$HOME/dev/tools/dpdk-stable-17.08.1 # for instance.
 NATIVE_LIB_PATH="${BASE_DIR}/native"
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
+# clang 3.8
+# export PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/bin/:$PATH
+# export LLVM_CONFIG_PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/bin/llvm-config
+# export LD_LIBRARY_PATH=$HOME/dev/clang-3.8/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04/lib
+
 native () {
     make -j $proc -C $BASE_DIR/native
     make -C $BASE_DIR/native install

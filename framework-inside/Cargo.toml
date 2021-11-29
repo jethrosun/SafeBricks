@@ -27,10 +27,13 @@ serde = ">= 1.0"
 serde_derive = ">= 1.0"
 twox-hash = ">= 1.2"
 # enclave can only use mbedtls for crypto.
-mbedtls = {version="0.5.1", default-features = false, features = ["sgx"]}
 # mbedtls = {version="0.3.0", path="../mbedtls-0.3.0/", default-features = false, features = ["sgx"]}
+# mbedtls = {version="0.5.1", default-features = false, features = ["sgx"]}
+# mbedtls = { git = "https://github.com/jethrosun/rust-mbedtls.git", branch = "pvn-mbedtls-0.5.1" }
+mbedtls = { git = "https://github.com/jethrosun/rust-mbedtls.git", branch = "master" }
 rustc-demangle = "=0.1.17"
 backtrace = "=0.3.45"
+cmake = "=0.1.42"
 
 [features]
 default = []
