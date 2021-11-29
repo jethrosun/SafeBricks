@@ -33,3 +33,5 @@ serde_derive = "1.0.84"    # MIT/Apache-2.0
 serde = "1.0.84"           # MIT/Apache-2.0
 toml = "0.4.10"            # MIT/Apache-2.0
 num_cpus = "1.9.0"         # MIT/Apache-2.0
+bitflags = "=1.2"
+openssl-sys = "=0.9.58"

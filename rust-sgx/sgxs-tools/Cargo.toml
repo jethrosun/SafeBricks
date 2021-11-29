@@ -62,6 +62,8 @@ serde = "1.0.84"                                 # MIT/Apache-2.0
 serde_derive = "1.0.84"                          # MIT/Apache-2.0
 serde_yaml = "0.8.8"                             # MIT/Apache-2.0
 pe = { version = "0.1", optional = true }        # GPL
+bitflags = "=1.2"
+openssl-sys = "=0.9.58"
 
 [features]
 pe2sgxs = ["pe", "broadcast"]

@@ -77,6 +77,22 @@ rustup install nightly-2020-05-30
 rustup override set nightly-2020-05-30
 ```
 
+### Install Rust SGX tools
+
+```shell
+...
+rustup target add x86_64-fortanix-unknown-sgx --toolchain nightly-2020-05-30
+...
+cd rust-sgx/fortanix-sgx-tools
+cargo +nightly-2020-05-30 b --release
+cargo +nightly-2020-05-30 install --path . 
+...
+cd ../sgxs-tools
+cargo +nightly-2020-05-30 b --release
+cargo +nightly-2020-05-30 install --path . 
+echo >> ~/.cargo/config -e '[target.x86_64-fortanix-unknown-sgx]\nrunner = "ftxsgx-runner-cargo"'
+```
+
 3. After step 2, you need to set `RTE_SDK` to the dpdk directory, and load cargo environment. Then you'll be able to compile and test NetBricks:
 ```shell
 host$ export RTE_SDK=$HOME/dev/tools/dpdk-stable-17.08.1 # for instance.
@@ -89,7 +105,7 @@ host$ make test
 
 We also provide some commands that might be helpful when dealing with DPDK hugepages in [setupHuge.sh](./setupHuge.sh).
 
-**Note**: when you switch between local deployment and container deployment, you need to ```sudo make clean``` to rebuild the dependencies in native/ (especially .make.dep).  
+**Note**: when you switch between local deployment and container deployment, you need to `sudo make clean` to rebuild the dependencies in native/ (especially .make.dep).  
 
 **Note**: if you find numerous error printed during `make build`, it is caused by the bindgen (generating rust binding for dpdk); you can solve it by deleting `~/tools/dpdk-stable-17.08.1` and run `./setupDpdk.sh`. The specific reason is that you might download my hacked version of dpdk, which will fail the bindgen binding. 
 
