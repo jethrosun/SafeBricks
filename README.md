@@ -63,10 +63,10 @@ host$ ./setupBuild.sh
 
 [setupBuild.sh](./setupBuild.sh) will install the rust nightly, clang, and etc for running NetBricks. 
 
-This NetBricks codebase works on rust nightly-2019-12-20. You can override the rust version in current directory to nightly-2019-12-20 by:
+This NetBricks codebase works on rust nightly-2020-05-30. You can override the rust version in current directory to nightly-2020-05-30 by:
 ```shell
-rustup install nightly-2019-12-20
-rustup override set nightly-2019-12-20
+rustup install nightly-2020-05-30
+rustup override set nightly-2020-05-30
 ```
 
 3. After step 2, you need to set `RTE_SDK` to the dpdk directory, and load cargo environment. Then you'll be able to compile and test NetBricks:
