@@ -23,7 +23,8 @@ sudo apt-get -q -y install build-essential ocaml automake autoconf libtool wget 
 sudo apt-get -q -y install libssl-dev libcurl4-openssl-dev protobuf-compiler libprotobuf-dev debhelper cmake
 sudo apt-get -q -y install intel-sgx-dkms
 sudo apt-get -y install libsctp-dev libssl-dev cmake llvm-3.9-dev libclang-3.9-dev clang-3.9 gcc-multilib
-sudo apt install -q -y docker-ce
+sudo apt install -q -y docker-ce libsgx-enclave-common sgx-aesm-service libsgx-aesm-launch-plugin
+
 
 if [ -e $HOME/.cargo/ ]; then
         echo "Passing, Rust already exists.."

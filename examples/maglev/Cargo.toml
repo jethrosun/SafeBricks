@@ -11,7 +11,7 @@ categories = ["network-functions", "framework"]
 
 [dependencies]
 netbricks = { path = "../../framework-inside" }
-time = ">= 0.1"
+time = "=0.1"
 getopts = ">= 0.2"
 rand = "0.6"
 fnv = ">= 1.0"

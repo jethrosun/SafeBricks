@@ -34,6 +34,7 @@ mbedtls = { git = "https://github.com/jethrosun/rust-mbedtls.git", branch = "mas
 rustc-demangle = "=0.1.17"
 backtrace = "=0.3.45"
 cmake = "=0.1.42"
+env_logger = "=0.4"
 
 [features]
 default = []

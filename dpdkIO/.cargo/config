@@ -1,0 +1,7 @@
+[build]
+target-dir = "../../../data/cargo-target"
+
+[term]
+color = 'auto'
+
+

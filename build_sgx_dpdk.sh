@@ -60,8 +60,8 @@ popd
 # export HYPERSCAN_ROOT=/usr/local
 # for TASK in dpi-hs
 # for TASK in acl-fw dpi lpm macswap maglev monitoring nat-tcp-v4 acl-fw-ipsec dpi-ipsec lpm-ipsec macswap-ipsec maglev-ipsec monitoring-ipsec nat-tcp-v4-ipsec acl-fw-ipsec-sha dpi-ipsec-sha lpm-ipsec-sha macswap-ipsec-sha maglev-ipsec-sha monitoring-ipsec-sha nat-tcp-v4-ipsec-sha
-for TASK in acl-fw 
-do 
+for TASK in acl-fw lpm macswap maglev monitoring
+do
 
 	# Build enclave APP
 	pushd examples/$TASK
@@ -74,8 +74,8 @@ do
 
 	# Convert the APP
 	if [ "$MODE" == "debug" ]; then # 2a
-	    ftxsgx-elf2sgxs target/x86_64-fortanix-unknown-sgx/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2 --debug
+	    ftxsgx-elf2sgxs ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2 --debug
 	else
-	    ftxsgx-elf2sgxs target/x86_64-fortanix-unknown-sgx/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2
+	    ftxsgx-elf2sgxs ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2
 	fi
 done

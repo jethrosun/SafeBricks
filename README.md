@@ -61,6 +61,11 @@ root$ ./setupBuild.sh
 echo "deb https://download.fortanix.com/linux/apt xenial main" | sudo tee -a /etc/apt/sources.list.d/fortanix.list >/dev/null
 curl -sSL "https://download.fortanix.com/linux/apt/fortanix.gpg" | sudo -E apt-key add -
 
+Install AESM service
+echo "deb https://download.01.org/intel-sgx/sgx_repo/ubuntu $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list.d/intel-sgx.list >/dev/null
+curl -sSL "https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key" | sudo -E apt-key add -
+
+# Get docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 sudo apt-get update
@@ -83,7 +88,7 @@ rustup override set nightly-2020-05-30
 ...
 rustup target add x86_64-fortanix-unknown-sgx --toolchain nightly-2020-05-30
 ...
-cd rust-sgx/fortanix-sgx-tools
+cd ~/dev/SafeBricks/rust-sgx/fortanix-sgx-tools
 cargo +nightly-2020-05-30 b --release
 cargo +nightly-2020-05-30 install --path . 
 ...

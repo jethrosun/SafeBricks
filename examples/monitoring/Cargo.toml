@@ -13,6 +13,7 @@ categories = ["network-functions", "framework"]
 fnv = ">= 1.0"
 lazy_static = ">= 1.3"
 netbricks = { path = "../../framework-inside"}
+time = "= 0.1"
 
 [features]
 default = []

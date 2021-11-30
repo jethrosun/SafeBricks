@@ -35,8 +35,8 @@ export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
 
 if [ $# -eq 2 ]; then
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 target/$MODE/sgx-runner -s target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -f sgx-runner/config_$2core.toml
+    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/sgx-runner -s ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -f sgx-runner/config_$2core.toml
 else
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 target/$MODE/sgx-runner -s target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -p $PORT_OPTIONS -c 0
+    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/sgx-runner -s ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -p $PORT_OPTIONS -c 0
 fi

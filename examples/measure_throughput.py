@@ -6,7 +6,7 @@ import datetime
 CmdSafeBricks = {
 	'startdpdk': 'cd .. && ./run_dpdk.sh {num_queue} 2>/dev/null &',
 	'startsgx': 'cd .. && ./run_sgx.sh {task} {num_queue} 2>/dev/null &',
-	'killdpdk': 'sudo pkill dpdkIO', 
+	'killdpdk': 'sudo pkill dpdkIO',
 	'killsgx': 'sudo pkill sgx-runner',
 }
 
@@ -35,8 +35,8 @@ def task_exec_reboot(task, pktgen_types, num_queue, repeat_num, throughput_res):
 				print "end pktgen %s" % (pktgen_type,)
 
 				print pktgen_results
-				start_index = pktgen_results.find(start_string) + len(start_string) 
-				# this task executes error. 
+				start_index = pktgen_results.find(start_string) + len(start_string)
+				# this task executes error.
 				if start_index == -1:
 					print colored("%s %s %s fails" % (task, pktgen_type, num_queue), 'red')
 					fail_count_inner += 1
@@ -56,19 +56,19 @@ def task_exec_reboot(task, pktgen_types, num_queue, repeat_num, throughput_res):
 					time.sleep(5) # wait for the port being restored.
 					fail_count_inner += 1
 					continue
-				
+
 				if fail_count_inner > 5:
 					return -1
 
 				throughput_val = pktgen_results[start_index: end_index]
 				throughput_val = float(throughput_val)
 
-				start_index = pktgen_results.find("avg_latency: ") + len("avg_latency: ") 
+				start_index = pktgen_results.find("avg_latency: ") + len("avg_latency: ")
 				end_index = pktgen_results.find(", tail_latency: ", start_index)
 				avg_latency_val = pktgen_results[start_index: end_index]
 				avg_latency_val = float(avg_latency_val)
 
-				start_index = pktgen_results.find(", tail_latency: ") + len(", tail_latency: ") 
+				start_index = pktgen_results.find(", tail_latency: ") + len(", tail_latency: ")
 				end_index = pktgen_results.find("\n", start_index)
 				tail_latency_val = pktgen_results[start_index: end_index]
 				tail_latency_val = float(tail_latency_val)
@@ -106,8 +106,8 @@ def task_exec(task, pktgen_types, num_queue, repeat_num, throughput_res):
 		print "end pktgen %s" % (test_pktgen,)
 
 		print pktgen_results
-		start_index = pktgen_results.find(start_string) + len(start_string) 
-		# this task executes error. 
+		start_index = pktgen_results.find(start_string) + len(start_string)
+		# this task executes error.
 		if start_index == -1:
 			print colored("%s %s %s fails" % (task, test_pktgen, num_queue), 'red')
 			fail_count_inner += 1
@@ -127,7 +127,7 @@ def task_exec(task, pktgen_types, num_queue, repeat_num, throughput_res):
 			time.sleep(5) # wait for the port being restored.
 			fail_count_inner += 1
 			continue
-		
+
 		if fail_count_inner > 5:
 			return -1
 		else:
@@ -140,18 +140,18 @@ def task_exec(task, pktgen_types, num_queue, repeat_num, throughput_res):
 			print "end pktgen %s" % (pktgen_type,)
 
 			print pktgen_results
-			start_index = pktgen_results.find(start_string) + len(start_string) 
+			start_index = pktgen_results.find(start_string) + len(start_string)
 			end_index = pktgen_results.find(end_string, start_index)
 
 			throughput_val = pktgen_results[start_index: end_index]
 			throughput_val = float(throughput_val)
 
-			start_index = pktgen_results.find("avg_latency: ") + len("avg_latency: ") 
+			start_index = pktgen_results.find("avg_latency: ") + len("avg_latency: ")
 			end_index = pktgen_results.find(", tail_latency: ", start_index)
 			avg_latency_val = pktgen_results[start_index: end_index]
 			avg_latency_val = float(avg_latency_val)
 
-			start_index = pktgen_results.find(", tail_latency: ") + len(", tail_latency: ") 
+			start_index = pktgen_results.find(", tail_latency: ") + len(", tail_latency: ")
 			end_index = pktgen_results.find("\n", start_index)
 			tail_latency_val = pktgen_results[start_index: end_index]
 			tail_latency_val = float(tail_latency_val)
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 			status = task_exec(task, pktgens, num_queue, TIMES, throughput_res)
 			if status == -1:
 				fail_count += 1
-				fail_cases.append(task + " " + num_queue)	
+				fail_cases.append(task + " " + num_queue)
 
 	for task in tasks_ipsec_reboot:
 		for num_queue in num_queues:
@@ -232,6 +232,6 @@ if __name__ == '__main__':
 				fail_count += 1
 				fail_cases.append(task + " " + num_queue)
 
-	
+
 	print colored(("success runs: %d/%d", (run_count - fail_count), run_count), 'green')
 	throughput_res.close()
