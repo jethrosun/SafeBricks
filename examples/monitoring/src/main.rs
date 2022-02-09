@@ -10,16 +10,15 @@ use netbricks::operators::{Batch, ReceiveBatch};
 use netbricks::packets::ip::v4::Ipv4;
 use netbricks::packets::ip::Flow;
 use netbricks::packets::{Ethernet, Packet, RawPacket, Tcp};
+use netbricks::scheduler::Scheduler;
+use netbricks::scheduler::{initialize_system, PKT_NUM};
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::BuildHasherDefault;
 use std::io::stdout;
 use std::io::Write;
-use std::cell::RefCell;
-use netbricks::scheduler::Scheduler;
-use netbricks::scheduler::{initialize_system, PKT_NUM};
 use std::sync::Arc;
-
 
 type FnvHash = BuildHasherDefault<FnvHasher>;
 
@@ -59,9 +58,15 @@ fn monitoring(packet: RawPacket) -> Result<Tcp<Ipv4>> {
     let v4 = ethernet.parse::<Ipv4>()?;
     let tcp = v4.parse::<Tcp<Ipv4>>()?;
     let flow = tcp.flow();
+    println!("{}", flow);
 
+    println!("before flow_map");
+    stdout().flush().unwrap();
     FLOW_MAP.with(|flow_map| {
-        // println!("{}", flow);stdout().flush().unwrap();
+        println!("inside flow_map");
+        stdout().flush().unwrap();
+        println!("{}", flow);
+        stdout().flush().unwrap();
         *((*flow_map.borrow_mut()).entry(flow).or_insert(0)) += 1;
     });
 
@@ -72,6 +77,7 @@ fn main() -> Result<()> {
     let configuration = load_config()?;
     println!("{}", configuration);
     let mut context = initialize_system(&configuration)?;
+    println!("PKT NUM: {}", PKT_NUM);
     context.run(Arc::new(install), PKT_NUM); // will trap in the run() and return after finish
     Ok(())
 }

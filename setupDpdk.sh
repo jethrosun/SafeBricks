@@ -54,9 +54,11 @@ make config T=x86_64-native-linuxapp-gcc EXTRA_CFLAGS="${CFLAGS}"
 make -j16 EXTRA_CFLAGS="${CFLAGS}"
 sudo make install
 
+sudo modprobe uio
 sudo insmod $DPDK_HOME/build/kmod/igb_uio.ko
 
-sudo $DPDK_HOME/usertools/dpdk-devbind.py --force -b igb_uio 0000:02:00.0 0000:02:00.1 0000:02:00.2 0000:02:00.3
+# sudo $DPDK_HOME/usertools/dpdk-devbind.py --force -b igb_uio 0000:02:00.0 0000:02:00.1 0000:02:00.2 0000:02:00.3
+sudo $DPDK_HOME/usertools/dpdk-devbind.py --force -b igb_uio 0000:01:00.0 0000:01:00.1 
 
 bash ~/dev/SafeBricks/setupDpdkCopy.sh
 

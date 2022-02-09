@@ -3,11 +3,6 @@
 #sudo chown -R yangzhou:lambda-mpi-PG0 ~/NetBricks
 
 
-#!/bin/bash
-
-#sudo chown -R yangzhou:lambda-mpi-PG0 ~/NetBricks
-
-
 # echo "deb https://download.fortanix.com/linux/apt xenial main" | sudo tee -a /etc/apt/sources.list.d/fortanix.list >/dev/null
 # curl -sSL "https://download.fortanix.com/linux/apt/fortanix.gpg" | sudo -E apt-key add -
 
@@ -26,18 +21,23 @@ sudo apt-get -y install libsctp-dev libssl-dev cmake llvm-3.9-dev libclang-3.9-d
 sudo apt install -q -y docker-ce libsgx-enclave-common sgx-aesm-service libsgx-aesm-launch-plugin
 
 
+# DATE=2021-01-20
+DATE=2020-05-30
+NIGHTLY=nightly-${DATE}
+
+
 if [ -e $HOME/.cargo/ ]; then
         echo "Passing, Rust already exists.."
         source $HOME/.cargo/env
-        rustup default nightly-2020-05-30-x86_64-unknown-linux-gnu
+        rustup default ${NIGHTLY}-x86_64-unknown-linux-gnu
 else
         # setup rust
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y
-        rustup toolchain install 2020-05-30-x86_64-unknown-linux-gnu --allow-downgrade --profile minimal --component rust-src rustfmt
+        rustup toolchain install ${DATE}-x86_64-unknown-linux-gnu --allow-downgrade --profile minimal --component rust-src rustfmt
         source $HOME/.cargo/env
 fi
 
-rustup target add x86_64-fortanix-unknown-sgx --toolchain nightly-2020-05-30
+rustup target add x86_64-fortanix-unknown-sgx --toolchain ${NIGHTLY}
 
 
 sudo usermod -aG docker ${USER}

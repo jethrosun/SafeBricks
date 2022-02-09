@@ -2,8 +2,6 @@
 source ./config.sh
 set -e
 
-TASK=macswap
-
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 if [[ -z ${CARGO_INCREMENTAL} ]] || [[ $CARGO_INCREMENTAL = false ]] || [[ $CARGO_INCREMENTAL = 0 ]]; then
@@ -23,6 +21,8 @@ DPDK_LD_PATH="${DPDK_HOME}/build/lib"
 
 NATIVE_LIB_PATH="${BASE_DIR}/native"
 
+TARGET_DIR="${HOME}/data/cargo-target/${MODE}"
+
 # Execute
 export PATH="${BIN_DIR}:${PATH}"
 export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
@@ -30,9 +30,9 @@ export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
 
 if [ $# -eq 1 ]; then
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/dpdkIO -f sgx-runner/config_$1core.toml
+    RUST_BACKTRACE=1 ${TARGET_DIR}/dpdkIO -f sgx-runner/config_$1core.toml
 else
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/dpdkIO -p $PORT_OPTIONS -c 0
+    RUST_BACKTRACE=1 ${TARGET_DIR}/dpdkIO -p $PORT_OPTIONS -c 0
 fi
 

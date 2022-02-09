@@ -10,22 +10,22 @@ members = [
     # "examples/ipv4or6",
     # "examples/mtu-too-big",
     # "examples/sctp",
-    # 
+    #
     # does not work now
     # "examples/op-errors",
     # "examples/signals",
     # "examples/tcp-reconstruction",
-    # 
+    #
     # for our experiments
     "examples/macswap",
-   	"examples/acl-fw",
-   	"examples/lpm",
-   	"examples/maglev",
-   	"examples/dpi",
-   	"examples/dpi-hs",
-   	"examples/nat-tcp-v4",
-   	"examples/monitoring",
-    # 
+    "examples/acl-fw",
+    "examples/lpm",
+    "examples/maglev",
+    "examples/dpi",
+    "examples/dpi-hs",
+    "examples/nat-tcp-v4",
+    "examples/monitoring",
+    #
     "examples/macswap-ipsec",
     "examples/acl-fw-ipsec",
     "examples/lpm-ipsec",
@@ -33,7 +33,7 @@ members = [
     "examples/dpi-ipsec",
     "examples/nat-tcp-v4-ipsec",
     "examples/monitoring-ipsec",
-    # 
+    #
     "examples/macswap-ipsec-sha",
     "examples/acl-fw-ipsec-sha",
     "examples/lpm-ipsec-sha",
@@ -41,7 +41,7 @@ members = [
     "examples/dpi-ipsec-sha",
     "examples/nat-tcp-v4-ipsec-sha",
     "examples/monitoring-ipsec-sha",
-    # for sgx 
+    # for sgx
     "sgx-runner",
     "dpdkIO",
     "sharedring",

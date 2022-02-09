@@ -26,7 +26,7 @@ libc = ">= 0.2"
 log = { version = "0.4", features = ["std", "serde"] }
 net2 = "0.2"
 # NIX restricts us to just unix for now, we can fix this if someone cares at a later point.
-nix = ">= 0.13"
+nix = "= 0.13"
 rayon = "1.0"
 regex = ">= 1.1"
 rust-sctp = { git="https://github.com/netsys/rust-sctp", optional = true}

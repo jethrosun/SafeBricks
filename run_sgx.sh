@@ -2,7 +2,8 @@
 source ./config.sh
 set -e
 
-TASK=macswap
+# default task
+# TASK=macswap
 
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
@@ -23,6 +24,10 @@ DPDK_LD_PATH="${DPDK_HOME}/build/lib"
 
 NATIVE_LIB_PATH="${BASE_DIR}/native"
 
+TARGET_DIR="$HOME/data/cargo-target/$MODE"
+SGX_TARGET_DIR="$HOME/data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE"
+
+
 if [ $# -ge 1 ]; then
     TASK=$1
 fi
@@ -35,8 +40,8 @@ export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
 
 if [ $# -eq 2 ]; then
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/sgx-runner -s ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -f sgx-runner/config_$2core.toml
+    RUST_BACKTRACE=1 ${TARGET_DIR}/sgx-runner -s ${SGX_TARGET_DIR}/${TASK}.sgxs -f sgx-runner/config_$2core.toml
 else
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 ../../data/cargo-target/$MODE/sgx-runner -s ../../data/cargo-target/x86_64-fortanix-unknown-sgx/$MODE/${TASK}.sgxs -p $PORT_OPTIONS -c 0
+    RUST_BACKTRACE=1 ${TARGET_DIR}/sgx-runner -s ${SGX_TARGET_DIR}/${TASK}.sgxs -p $PORT_OPTIONS -c 0
 fi

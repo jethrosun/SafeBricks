@@ -17,12 +17,18 @@ echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
 echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
 
 CARGO_FLAGS="--target x86_64-fortanix-unknown-sgx"
+# CARGO_FLAGS="--target x86_64-fortanix-unknown-sgx --release"
 MODE="x86_64-fortanix-unknown-sgx/"
 
 CARGO_LOC=`which cargo || true`
 export CARGO=${CARGO_PATH-"${CARGO_LOC}"}
 CLIPPY_ARGS="--all-targets --all-features -- -D clippy::wildcard_dependencies -D clippy::cargo_common_metadata -D warnings"
 
+RELEASE_TARGET_DIR="/home/jethros/data/cargo-target/${MODE}release"
+DEBUG_TARGET_DIR="/home/jethros/data/cargo-target/${MODE}debug"
+
+# NIGHTLY=nightly-2021-01-20
+NIGHTLY=nightly-2020-05-30
 
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
@@ -43,8 +49,6 @@ popd () {
 }
 
 
-
-
 print_examples () {
     echo "The following examples are available:"
     for eg in ${examples[@]}; do
@@ -58,12 +62,12 @@ print_examples () {
 
 clean () {
     pushd $BASE_DIR/framework
-    ${CARGO} clean || true
+    ${CARGO} +${NIGHTLY} clean || true
     popd
 
     for example in ${examples[@]}; do
         pushd ${BASE_DIR}/$example
-        ${CARGO} clean || true
+        ${CARGO} +${NIGHTLY} clean || true
         popd
     done
     rm -rf ${BASE_DIR}/target
@@ -72,7 +76,7 @@ clean () {
 build_fmwk () {
 
     pushd $BASE_DIR/framework
-    ${CARGO} build $CARGO_FLAGS
+    ${CARGO} +${NIGHTLY} build $CARGO_FLAGS
     popd
 }
 
@@ -89,7 +93,7 @@ case $TASK in
         for example in ${examples[@]}; do
             if [ -f $BASE_DIR/$example/check.sh ]; then
                 pushd ${BASE_DIR}/${example}
-                ${CARGO} build $CARGO_FLAGS
+                ${CARGO} +${NIGHTLY} build $CARGO_FLAGS
                 popd
             fi
         done
@@ -99,7 +103,7 @@ case $TASK in
 
         for example in ${examples[@]}; do
             pushd ${BASE_DIR}/${example}
-            ${CARGO} build $CARGO_FLAGS
+            ${CARGO} +${NIGHTLY} build $CARGO_FLAGS
             popd
         done
         ;;
@@ -121,7 +125,7 @@ case $TASK in
             echo "No Cargo.toml, not valid"
         fi
         pushd ${BASE_DIR}/examples/${build_dir}
-        ${CARGO} build $CARGO_FLAGS
+        ${CARGO} +${NIGHTLY} build $CARGO_FLAGS
         popd
         ;;
     build_example_rel)
@@ -139,17 +143,17 @@ case $TASK in
             echo "No Cargo.toml, not valid"
         fi
         pushd ${BASE_DIR}/examples/${build_dir}
-        ${CARGO} build --release $CARGO_FLAGS
+        ${CARGO} +${NIGHTLY} build --release $CARGO_FLAGS
         popd
         ;;
     build_rel)
         pushd $BASE_DIR/framework
-        ${CARGO} build --release $CARGO_FLAGS
+        ${CARGO} +${NIGHTLY} build --release $CARGO_FLAGS
         popd
 
         for example in ${examples[@]}; do
             pushd ${BASE_DIR}/${example}
-            ${CARGO} build --release $CARGO_FLAGS
+            ${CARGO} +${NIGHTLY} build --release $CARGO_FLAGS
             popd
         done
         ;;
@@ -158,16 +162,16 @@ case $TASK in
         ;;
     check_manifest)
         pushd ${BASE_DIR}
-        ${CARGO} verify-project --verbose
+        ${CARGO} +${NIGHTLY} verify-project --verbose
         popd
 
         pushd ${BASE_DIR}/framework
-        ${CARGO} verify-project | grep true
+        ${CARGO} +${NIGHTLY} verify-project | grep true
         popd
 
         for example in ${examples[@]}; do
             pushd ${BASE_DIR}/${example}
-            ${CARGO} verify-project | grep true
+            ${CARGO} +${NIGHTLY} verify-project | grep true
             popd
         done
         ;;
@@ -181,7 +185,7 @@ case $TASK in
         fi
         cmd=$1
         shift
-        executable=${BASE_DIR}/target/${MODE}debug/$cmd
+        executable=${DEBUG_TARGET_DIR}/$cmd
         if [ ! -e ${executable} ]; then
             echo "${executable} not found, building"
             ${BASE_DIR}/${BUILD_SCRIPT} build
@@ -192,7 +196,7 @@ case $TASK in
         ;;
     doc)
         pushd $BASE_DIR/framework
-        ${CARGO} rustdoc -- \
+        ${CARGO} +${NIGHTLY} rustdoc -- \
                  --no-defaults --passes "collapse-docs" --passes \
                  "unindent-comments"
         popd
@@ -202,18 +206,18 @@ case $TASK in
         ;;
     fmt)
         pushd $BASE_DIR/framework
-        ${CARGO} fmt
+        ${CARGO} +${NIGHTLY} fmt
         popd
 
         for example in ${examples[@]}; do
             pushd ${BASE_DIR}/${example}
-            ${CARGO} fmt
+            ${CARGO} +${NIGHTLY} fmt
             popd
         done
         ;;
     lint)
         echo "Linting w/: $CLIPPY_ARGS"
-        ${CARGO} clippy $CLIPPY_ARGS
+        ${CARGO} +${NIGHTLY} clippy $CLIPPY_ARGS
         ;;
     run)
         shift
@@ -222,7 +226,7 @@ case $TASK in
         fi
         cmd=$1
         shift
-        executable=${BASE_DIR}/target/${MODE}debug/$cmd
+        executable=${DEBUG_TARGET_DIR}/$cmd
         if [ ! -e ${executable} ]; then
             echo "${executable} not found, building"
             ${BASE_DIR}/${BUILD_SCRIPT} build
@@ -239,7 +243,7 @@ case $TASK in
         fi
         cmd=$1
         shift
-        executable=${BASE_DIR}/target/${MODE}release/$cmd
+        executable=${RELEASE_TARGET_DIR}/$cmd
         if [ ! -e ${executable} ]; then
             echo "${executable} not found, building"
             ${BASE_DIR}/${BUILD_SCRIPT} build_rel
@@ -259,7 +263,7 @@ case $TASK in
             echo "...and all unit and property-based tests"
 
             pushd $BASE_DIR/framework
-            ${CARGO} test $CARGO_FLAGS
+            ${CARGO} +${NIGHTLY} test $CARGO_FLAGS
             popd
 
             for testname in ${examples[@]}; do
