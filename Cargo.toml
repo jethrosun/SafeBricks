@@ -45,6 +45,8 @@ members = [
     "sgx-runner",
     "dpdkIO",
     "sharedring",
+    # auditing
+    "examples/traversal"
 ]
 exclude = ["rust-sgx", "mbedtls-0.3.0"]
 

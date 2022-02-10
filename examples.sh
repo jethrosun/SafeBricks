@@ -39,4 +39,5 @@ export examples=(
         examples/maglev-ipsec-sha
         examples/dpi-ipsec-sha
         examples/monitoring-ipsec-sha
+        examples/traversal
 )
