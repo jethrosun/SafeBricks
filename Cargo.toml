@@ -46,7 +46,8 @@ members = [
     "dpdkIO",
     "sharedring",
     # auditing
-    "examples/traversal"
+    "examples/traversal",
+    "examples/echo-reply-v4"
 ]
 exclude = ["rust-sgx", "mbedtls-0.3.0"]
 
