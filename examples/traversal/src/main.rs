@@ -54,7 +54,6 @@ where
     S: Scheduler + Sized,
 {
     println!("Receiving started");
-    println!("Ports: {:?}", ports);
     let pipelines: Vec<_> = ports
         .iter()
         .map(move |port| {
@@ -64,7 +63,6 @@ where
                 .sendall(port.clone())
         })
         .collect();
-    println!("Pipelines: {:?}", pipelines);
 
     println!("Running {} pipelines", pipelines.len());
     for pipeline in pipelines {

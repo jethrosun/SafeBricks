@@ -17,6 +17,10 @@ fi
 echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
 echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
 
+# just enforce it
+export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
+export RUST_BACKTRACE="RUST_BACKTRACE=0 "
+
 DPDK_VER=17.08.1
 DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
 DPDK_LD_PATH="${DPDK_HOME}/build/lib"
