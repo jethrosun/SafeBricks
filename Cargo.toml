@@ -47,7 +47,7 @@ members = [
     "sharedring",
     # auditing
     "examples/traversal",
-    "examples/echo-reply-v4"
+    "examples/forward",
 ]
 exclude = ["rust-sgx", "mbedtls-0.3.0"]
 

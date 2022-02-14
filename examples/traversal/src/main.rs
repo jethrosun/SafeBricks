@@ -54,18 +54,21 @@ where
     S: Scheduler + Sized,
 {
     println!("Receiving started");
-
+    println!("Ports: {:?}", ports);
     let pipelines: Vec<_> = ports
         .iter()
         .map(move |port| {
+            println!("Port: {:?}", port);
             ReceiveBatch::new(port.clone())
                 .map(|p| traversal(p))
                 .sendall(port.clone())
         })
         .collect();
+    println!("Pipelines: {:?}", pipelines);
 
     println!("Running {} pipelines", pipelines.len());
     for pipeline in pipelines {
+        println!("Pipeline: {:?}", pipeline);
         sched.add_task(pipeline).unwrap();
     }
 }

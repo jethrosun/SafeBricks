@@ -1,10 +1,9 @@
 [package]
-name = "echo-reply-v4"
+name = "forward"
 version = "0.1.0"
 authors = ["Aurojit Panda <apanda@cs.berkeley.edu>", "William of Ockham <williamofockham@gmail.com>"]
-description = "Example: tcp ipv4 nat"
+description = "Example: forward"
 license = "..."
-repository = "https://github.com/williamofockham/NetBricks/tree/master/examples/nat-tcp-v4"
 readme = "..."
 keywords = ["netbricks", "network-functions", "nfs", "packet-processing"]
 categories = ["network-functions", "framework"]

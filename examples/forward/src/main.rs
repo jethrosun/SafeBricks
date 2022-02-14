@@ -13,9 +13,11 @@ use netbricks::packets::{Ethernet, Packet, RawPacket, Tcp};
 use netbricks::scheduler::Scheduler;
 use netbricks::scheduler::{initialize_system, PKT_NUM};
 use std::cell::RefCell;
+use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::BuildHasherDefault;
+use std::hash::{Hash, Hasher};
 use std::io::stdout;
 use std::io::Write;
 use std::sync::Arc;
@@ -23,10 +25,27 @@ use std::sync::Arc;
 type FnvHash = BuildHasherDefault<FnvHasher>;
 
 thread_local! {
+    // Per flow packet counter
     pub static FLOW_MAP: RefCell<HashMap<Flow, u64, FnvHash>> = {
         let m = HashMap::with_hasher(Default::default());
         RefCell::new(m)
     };
+
+    // Per flow packet payload hash
+    pub static FLOW_PAYLOAD_MAP: RefCell<HashMap<Flow, Vec<u64>, FnvHash>> = {
+        let m = HashMap::with_hasher(Default::default());
+        RefCell::new(m)
+    };
+}
+
+pub fn calculate_hash<T: Hash>(t: T) -> u64 {
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    s.finish()
+}
+
+pub fn hash_it(a: &[u8]) -> u64 {
+    calculate_hash(a)
 }
 
 fn install<T, S>(ports: Vec<T>, sched: &mut S)
@@ -34,7 +53,7 @@ where
     T: PacketRx + PacketTx + Display + Clone + 'static,
     S: Scheduler + Sized,
 {
-    println!("Echo reply pipeline");
+    println!("Forwarding pipeline");
 
     let (producer, outbound) = mpsc_batch();
     let outbound = outbound.send(ports[0].clone());
@@ -47,44 +66,57 @@ where
         .map(move |port| {
             let producer = producer.clone();
             ReceiveBatch::new(port.clone())
-                .map(move |p| reply_echo(p, &producer))
+                .map(move |p| forward(p, &producer))
                 .filter(|_| false)
                 .send(port.clone())
         })
         .collect();
 
-    println!("Running {} pipelines", pipelines.len());
+    println!("Running {} pipelines", pipelines.len() + 1);
     for pipeline in pipelines {
         sched.add_task(pipeline).unwrap();
     }
 }
 
-fn reply_echo(packet: RawPacket, producer: &MpscProducer) -> Result<Icmpv4<Ipv4, EchoRequest>> {
-    let reply = RawPacket::new()?;
+fn traversal(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
+    let mut ethernet = packet.parse::<Ethernet>()?;
+    ethernet.swap_addresses();
+    let v4 = ethernet.parse::<Ipv4>()?;
+    let tcp = v4.parse::<Tcp<Ipv4>>()?;
+    let flow = tcp.flow();
+    println!("{}", flow);
 
-    let ethernet = packet.parse::<Ethernet>()?;
-    let mut reply = reply.push::<Ethernet>()?;
-    reply.set_src(ethernet.dst());
-    reply.set_dst(ethernet.src());
-    reply.set_ether_type(EtherTypes::Ipv4);
+    println!("before flow_map");
+    stdout().flush().unwrap();
 
-    let ipv4 = ethernet.parse::<Ipv4>()?;
-    let mut reply = reply.push::<Ipv4>()?;
-    reply.set_src(ipv4.dst());
-    reply.set_dst(ipv4.src());
-    reply.set_next_header(ProtocolNumbers::Icmpv4);
+    let payload = tcp.get_payload();
+    let hash = hash_it(payload);
 
-    let icmpv4 = ipv4.parse::<Icmpv4<Ipv4, ()>>()?;
-    let echo = icmpv4.downcast::<EchoRequest>()?;
-    let mut reply = reply.push::<Icmpv4<Ipv4, EchoReply>>()?;
-    reply.set_identifier(echo.identifier());
-    reply.set_seq_no(echo.seq_no());
-    reply.set_data(echo.data())?;
-    reply.cascade();
+    // no integrity check
+    // FLOW_MAP.with(|flow_map| {
+    //     packet.payload = flow_map
+    //     println!("inside flow_map");
+    //     stdout().flush().unwrap();
+    //     println!("{}", flow);
+    //     stdout().flush().unwrap();
+    //     *((*flow_map.borrow_mut()).entry(flow).or_insert(0)) += 1;
+    // });
 
-    producer.enqueue(reply.reset());
+    // integrity check
+    FLOW_PAYLOAD_MAP.with(|flow_map| {
+        println!("inside flow_map");
+        stdout().flush().unwrap();
+        println!("Flow: {}, Hash: {}", flow, hash);
+        stdout().flush().unwrap();
+        (*flow_map.borrow_mut())
+            .entry(flow)
+            .or_insert(vec![hash])
+            .push(hash);
+    });
 
-    Ok(echo)
+    producer.enqueue(tcp);
+
+    Ok(tcp)
 }
 
 fn main() -> Result<()> {
