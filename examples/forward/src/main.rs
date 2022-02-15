@@ -6,6 +6,8 @@ use fnv::FnvHasher;
 use netbricks::common::Result;
 use netbricks::config::load_config;
 use netbricks::interface::{PacketRx, PacketTx};
+use netbricks::operators::mpsc_batch;
+use netbricks::operators::MpscProducer;
 use netbricks::operators::{Batch, ReceiveBatch};
 use netbricks::packets::ip::v4::Ipv4;
 use netbricks::packets::ip::Flow;
@@ -78,7 +80,7 @@ where
     }
 }
 
-fn traversal(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
+fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
     let mut ethernet = packet.parse::<Ethernet>()?;
     ethernet.swap_addresses();
     let v4 = ethernet.parse::<Ipv4>()?;

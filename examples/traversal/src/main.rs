@@ -64,7 +64,7 @@ where
         })
         .collect();
 
-    println!("Running {} pipelines", pipelines.len());
+    println!("Running {} pipelines", pipelines.len()+1);
     for pipeline in pipelines {
         // println!("Pipeline: {:?}", pipeline);
         sched.add_task(pipeline).unwrap();

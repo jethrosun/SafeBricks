@@ -71,7 +71,7 @@ popd
 # export HYPERSCAN_ROOT=/usr/local
 # for TASK in dpi-hs
 # for TASK in acl-fw dpi lpm macswap maglev monitoring nat-tcp-v4 acl-fw-ipsec dpi-ipsec lpm-ipsec macswap-ipsec maglev-ipsec monitoring-ipsec nat-tcp-v4-ipsec acl-fw-ipsec-sha dpi-ipsec-sha lpm-ipsec-sha macswap-ipsec-sha maglev-ipsec-sha monitoring-ipsec-sha nat-tcp-v4-ipsec-sha
-for TASK in acl-fw lpm macswap maglev monitoring traversal
+for TASK in acl-fw lpm macswap maglev monitoring traversal forward
 do
     # Build enclave APP
     pushd examples/$TASK
