@@ -54,11 +54,10 @@ where
     }
 }
 
-fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<RawPacket> {
+fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<()> {
     producer.enqueue(packet);
 
-    let bogus = RawPacket::new()?;
-    Ok(bogus)
+    Ok(())
 }
 
 fn main() -> Result<()> {
