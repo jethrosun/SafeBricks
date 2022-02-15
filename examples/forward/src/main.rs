@@ -79,7 +79,7 @@ where
 }
 
 fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
-    let mut ethernet = packet.parse::<Ethernet>()?;
+    let mut ethernet = packet.clone().parse::<Ethernet>()?;
     ethernet.swap_addresses();
     let v4 = ethernet.parse::<Ipv4>()?;
     let tcp = v4.parse::<Tcp<Ipv4>>()?;
