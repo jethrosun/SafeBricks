@@ -57,7 +57,7 @@ where
     let pipelines: Vec<_> = ports
         .iter()
         .map(move |port| {
-            println!("Port: {:?}", port);
+            // println!("Port: {:?}", port);
             ReceiveBatch::new(port.clone())
                 .map(|p| traversal(p))
                 .sendall(port.clone())
@@ -66,7 +66,7 @@ where
 
     println!("Running {} pipelines", pipelines.len());
     for pipeline in pipelines {
-        println!("Pipeline: {:?}", pipeline);
+        // println!("Pipeline: {:?}", pipeline);
         sched.add_task(pipeline).unwrap();
     }
 }
