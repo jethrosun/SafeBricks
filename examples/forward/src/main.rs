@@ -43,9 +43,18 @@ where
             let producer = producer.clone();
             ReceiveBatch::new(port.clone())
                 .map(move |p| forward(p, &producer))
-                .send(port.clone())
+                .sendall(port.clone())
         })
         .collect();
+    // let pipelines: Vec<_> = ports
+    //     .iter()
+    //     .map(move |port| {
+    //         // println!("Port: {:?}", port);
+    //         ReceiveBatch::new(port.clone())
+    //             .map(|p| traversal(p))
+    //             .sendall(port.clone())
+    //     })
+    //     .collect();
 
     println!("Running {} pipelines", pipelines.len() + 1);
     for pipeline in pipelines {
