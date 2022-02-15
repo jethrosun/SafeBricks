@@ -24,30 +24,6 @@ use std::sync::Arc;
 
 type FnvHash = BuildHasherDefault<FnvHasher>;
 
-thread_local! {
-    // Per flow packet counter
-    pub static FLOW_MAP: RefCell<HashMap<Flow, u64, FnvHash>> = {
-        let m = HashMap::with_hasher(Default::default());
-        RefCell::new(m)
-    };
-
-    // Per flow packet payload hash
-    pub static FLOW_PAYLOAD_MAP: RefCell<HashMap<Flow, Vec<u64>, FnvHash>> = {
-        let m = HashMap::with_hasher(Default::default());
-        RefCell::new(m)
-    };
-}
-
-pub fn calculate_hash<T: Hash>(t: T) -> u64 {
-    let mut s = DefaultHasher::new();
-    t.hash(&mut s);
-    s.finish()
-}
-
-pub fn hash_it(a: &[u8]) -> u64 {
-    calculate_hash(a)
-}
-
 fn install<T, S>(ports: Vec<T>, sched: &mut S)
 where
     T: PacketRx + PacketTx + Display + Clone + 'static,
@@ -79,41 +55,6 @@ where
 }
 
 fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
-    let mut ethernet = packet.clone().parse::<Ethernet>()?;
-    ethernet.swap_addresses();
-    let v4 = ethernet.parse::<Ipv4>()?;
-    let tcp = v4.parse::<Tcp<Ipv4>>()?;
-    let flow = tcp.flow();
-    println!("{}", flow);
-
-    println!("before flow_map");
-    stdout().flush().unwrap();
-
-    let payload = tcp.get_payload();
-    let hash = hash_it(payload);
-
-    // no integrity check
-    // FLOW_MAP.with(|flow_map| {
-    //     packet.payload = flow_map
-    //     println!("inside flow_map");
-    //     stdout().flush().unwrap();
-    //     println!("{}", flow);
-    //     stdout().flush().unwrap();
-    //     *((*flow_map.borrow_mut()).entry(flow).or_insert(0)) += 1;
-    // });
-
-    // integrity check
-    FLOW_PAYLOAD_MAP.with(|flow_map| {
-        println!("inside flow_map");
-        stdout().flush().unwrap();
-        println!("Flow: {}, Hash: {}", flow, hash);
-        stdout().flush().unwrap();
-        (*flow_map.borrow_mut())
-            .entry(flow)
-            .or_insert(vec![hash])
-            .push(hash);
-    });
-
     producer.enqueue(packet);
 
     Ok(tcp)
