@@ -114,7 +114,7 @@ fn forward(packet: RawPacket, producer: &MpscProducer) -> Result<Tcp<Ipv4>> {
             .push(hash);
     });
 
-    producer.enqueue(tcp);
+    producer.enqueue(packet);
 
     Ok(tcp)
 }
