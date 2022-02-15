@@ -43,7 +43,6 @@ where
             let producer = producer.clone();
             ReceiveBatch::new(port.clone())
                 .map(move |p| forward(p, &producer))
-                .filter(|_| false)
                 .send(port.clone())
         })
         .collect();
