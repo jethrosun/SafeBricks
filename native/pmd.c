@@ -2,6 +2,7 @@
 #include <rte_eal.h>
 #include <rte_ethdev.h>
 #include <rte_pci.h>
+
 #include "mempool.h"
 
 #define HW_RXCSUM 0
@@ -203,6 +204,28 @@ int recv_pkts(int port, int qid, mbuf_array_t pkts, int len) {
 
 int send_pkts(int port, int qid, mbuf_array_t pkts, int len) {
     return rte_eth_tx_burst(port, (uint16_t)qid, (struct rte_mbuf**)pkts, (uint16_t)len);
+}
+
+void print_stats(int port, int extended) {
+    int i;
+    struct rte_eth_stats eth_stats;
+
+    rte_eth_stats_get(port, &eth_stats);
+    printf("\nPort %u stats:\n", port);
+    printf(" - Pkts in:   %" PRIu64 "\n", eth_stats.ipackets);
+    printf(" - Pkts out:  %" PRIu64 "\n", eth_stats.opackets);
+    printf(" - In Errs:   %" PRIu64 "\n", eth_stats.ierrors);
+    printf(" - Out Errs:  %" PRIu64 "\n", eth_stats.oerrors);
+    printf(" - Mbuf Errs: %" PRIu64 "\n", eth_stats.rx_nombuf);
+    if (extended) {
+        for (i = 0; i < RTE_ETHDEV_QUEUE_STAT_CNTRS; ++i) {
+            printf("Queue %i - q_errors: %li\n", i, eth_stats.q_errors[i]);
+            printf("         - q_ipackets: %li\n", eth_stats.q_ipackets[i]);
+        }
+        for (i = 0; i < RTE_ETHDEV_QUEUE_STAT_CNTRS; ++i) {
+            printf("Queue %i - q_opackets: %li\n", i, eth_stats.q_opackets[i]);
+        }
+    }
 }
 
 int find_port_with_pci_address(const char* pci) {

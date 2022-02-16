@@ -33,6 +33,7 @@ extern "C" {
         tso: i32,
         csumoffload: i32,
     ) -> i32;
+    pub fn print_stats(port: i32, extended: i32);
     pub fn free_pmd_port(port: i32) -> i32;
     pub fn recv_pkts(port: i32, qid: i32, pkts: *mut *mut MBuf, len: i32) -> i32;
     pub fn send_pkts(port: i32, qid: i32, pkts: *mut *mut MBuf, len: i32) -> i32;

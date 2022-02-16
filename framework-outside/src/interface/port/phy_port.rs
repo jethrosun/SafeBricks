@@ -261,6 +261,13 @@ impl PmdPort {
         }
     }
 
+    #[inline]
+    pub fn print_port_stats(&self, extended: bool) {
+        unsafe {
+            print_stats(self.port, extended as i32);
+        };
+    }
+
     /// Create a new port that can talk to BESS.
     fn new_bess_port(name: &str, core: i32) -> Result<Arc<PmdPort>> {
         let ifname = CString::new(name).unwrap();
@@ -463,5 +470,10 @@ impl PmdPort {
             zcsi::rte_eth_macaddr_get(self.port, &mut address as *mut MacAddr);
             address
         }
+    }
+
+    #[inline]
+    pub fn port(&self) -> i32 {
+        self.port
     }
 }

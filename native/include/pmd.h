@@ -8,4 +8,6 @@ int init_pmd_port(int port, int rxqs, int txqs, int rxq_core[], int txq_core[], 
 int free_pmd_port(int port);
 int recv_pkts(int port, int qid, mbuf_array_t pkts, int len);
 int send_pkts(int port, int qid, mbuf_array_t pkts, int len);
+// Print NIC stats
+void print_stats(int port, int extended);
 #endif
