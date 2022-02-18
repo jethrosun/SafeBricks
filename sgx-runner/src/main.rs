@@ -33,8 +33,8 @@ use std::time::{Duration, Instant};
 use tokio::timer::{Delay, Interval};
 type TokioRuntime = tokio::runtime::current_thread::Runtime;
 
-const PKT_NUM: u64 = (8 * 1024 * 1024);
-const PRINT_INTER: u64 = (1024 * 1024);
+// const PKT_NUM: u64 = (8 * 1024 * 1024);
+// const PRINT_INTER: u64 = (1024 * 1024);
 
 // pull_count;
 lazy_static! {

@@ -34,7 +34,7 @@ use std::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 use std::io::stdout;
 use std::io::Write;
 
-const PKT_NUM: u64 = (8 * 1024 * 1024);
+// const PKT_NUM: u64 = (8 * 1024 * 1024);
 const PRINT_INTER: u64 = (1024 * 1024);
 
 // pull_count;
@@ -126,9 +126,7 @@ where
                         mbufs.my_mbufs.drain(..sent);
                     }
                 }
-                unsafe {
-                    unsafe { mbufs.my_mbufs.set_len(0) };
-                }
+                unsafe { mbufs.my_mbufs.set_len(0) };
             }
 
             // thread::sleep(std::time::Duration::from_secs(1));// for debugging;
@@ -161,9 +159,7 @@ where
                         _ => unreachable!(),
                     }
                 }
-                unsafe {
-                    unsafe { mbufs.my_mbufs.set_len(0) };
-                }
+                unsafe { mbufs.my_mbufs.set_len(0) };
             }
             pkt_count_from_nic[i] += recv_pkt_num_from_nic as u64;
             pkt_count_from_enclave[i] += recv_pkt_num_from_enclave as u64;
