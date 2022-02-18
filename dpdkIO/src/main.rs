@@ -208,8 +208,8 @@ pub fn forward_ports(ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligned<Po
     let port1 = ports.pop().unwrap();
 
     std::mem::swap(&mut port0.tx_port.mac_address(), &mut port1.tx_port.mac_address());
-    std::mem::swap(&mut port0.tx_port_id, &mut port1.tx_port_id);
-    std::mem::swap(&mut port0.txq, &mut port1.txq);
+    // std::mem::swap(&mut port0.tx_port_id, &mut port1.tx_port_id);
+    // std::mem::swap(&mut port0.txq, &mut port1.txq);
 
     let mut forward_ports: Vec<CacheAligned<PortQueue>> = Vec::new();
     forward_ports.push(port0);
