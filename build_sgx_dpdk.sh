@@ -6,21 +6,6 @@ BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 echo $BASE_DIR
 BUILD_SCRIPT=$( basename "$0" )
 
-if [[ -z ${CARGO_INCREMENTAL} ]] || [[ $CARGO_INCREMENTAL = false ]] || [[ $CARGO_INCREMENTAL = 0 ]]; then
-    export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
-fi
-
-if [[ -z ${RUST_BACKTRACE} ]] || [[ RUST_BACKTRACE = true ]] || [[ RUST_BACKTRACE = 1 ]]; then
-    export RUST_BACKTRACE="RUST_BACKTRACE=1 "
-fi
-
-echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
-echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
-
-# just enforce it
-export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
-export RUST_BACKTRACE="RUST_BACKTRACE=0 "
-
 CARGO_PATH="$HOME/.cargo/bin/cargo"
 CARGO_LOC=$(which cargo || true)
 export CARGO=${CARGO_PATH-"${CARGO_LOC}"}
@@ -30,8 +15,28 @@ if [ -z "${CARGO}" ] || [ ! -e "${CARGO}" ]; then
 fi
 echo "Using Cargo from ${CARGO}"
 
-# We fix the Cargo toolchain
-declare toolchain=nightly-2020-12-25-x86_64-unknown-linux-gnu
+# RUST_TEST="${TOOLS_BASE}/bin/rustc"
+# RUST_DOWNLOAD_PATH="${EXT_BASE}/rust"
+
+export RUSTFLAGS="-C target-cpu=native"
+
+# if [[ -z ${CARGO_INCREMENTAL} ]] || [[ $CARGO_INCREMENTAL = false ]] || [[ $CARGO_INCREMENTAL = 0 ]]; then
+#     export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
+# fi
+#
+# if [[ -z ${RUST_BACKTRACE} ]] || [[ RUST_BACKTRACE = true ]] || [[ RUST_BACKTRACE = 1 ]]; then
+#     export RUST_BACKTRACE="RUST_BACKTRACE=1 "
+# fi
+#
+# echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
+# echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
+#
+# # just enforce it
+# export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
+# export RUST_BACKTRACE="RUST_BACKTRACE=0 "
+#
+# # We fix the Cargo toolchain
+# declare toolchain=nightly-2020-12-25-x86_64-unknown-linux-gnu
 
 DPDK_VER=17.08.1
 DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
