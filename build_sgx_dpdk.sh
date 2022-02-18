@@ -37,7 +37,7 @@ export RUSTFLAGS="-C target-cpu=native"
 #
 # # We fix the Cargo toolchain
 declare TOOLCHAIN=nightly-2020-05-30-x86_64-unknown-linux-gnu
-declare SGX_TOOLCHAIN=nightly-2020-05-30-x86_64-fortanix-unknown-sgx
+# declare SGX_TOOLCHAIN=nightly-2020-05-30-x86_64-fortanix-unknown-sgx
 
 DPDK_VER=17.08.1
 DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
@@ -50,8 +50,8 @@ NATIVE_LIB_PATH="${BASE_DIR}/native"
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 TARGET_DIR="${HOME}/data/cargo-target/x86_64-fortanix-unknown-sgx"
-RELEASE_TARGET_DIR="${HOME}/data/cargo-target/${MODE}release"
-DEBUG_TARGET_DIR="${HOME}/data/cargo-target/${MODE}debug"
+# RELEASE_TARGET_DIR="${HOME}/data/cargo-target/${MODE}release"
+# DEBUG_TARGET_DIR="${HOME}/data/cargo-target/${MODE}debug"
 
 # NIGHTLY=nightly-2021-01-20
 NIGHTLY=nightly-2020-05-30
@@ -94,9 +94,9 @@ do
     # Build enclave APP
     pushd examples/$TASK
     if [ "$MODE" == "debug" ]; then
-	${CARGO} +${SGX_TOOLCHAIN} build
+	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
     else
-	${CARGO} +${SGX_TOOLCHAIN} build --release
+	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
     fi
     popd
 
