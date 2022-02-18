@@ -30,7 +30,7 @@ export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
 
 if [ $# -eq 1 ]; then
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
-    RUST_BACKTRACE=1 ${TARGET_DIR}/dpdkIO -f sgx-runner/config_$1core.toml
+    RUST_BACKTRACE=1 ${TARGET_DIR}/dpdkIO -f configs/config_$1core.toml
 else
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
     RUST_BACKTRACE=1 ${TARGET_DIR}/dpdkIO -p $PORT_OPTIONS -c 0

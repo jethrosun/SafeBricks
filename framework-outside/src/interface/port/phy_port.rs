@@ -52,10 +52,12 @@ pub struct PmdPort {
 pub struct PortQueue {
     // The Arc cost here should not affect anything, since we are really not doing anything to make it go in and out of
     // scope.
-    pub port: Arc<PmdPort>,
+    pub rx_port: Arc<PmdPort>,
+    pub tx_port: Arc<PmdPort>,
     stats_rx: Arc<CacheAligned<PortStats>>,
     stats_tx: Arc<CacheAligned<PortStats>>,
-    port_id: i32,
+    rx_port_id: i32,
+    tx_port_id: i32,
     txq: i32,
     rxq: i32,
 }
@@ -75,21 +77,24 @@ impl fmt::Display for PortQueue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "port: {} ({}) rxq: {} txq: {}",
-            self.port.mac_address(),
-            self.port_id,
+            "RX port: {}, TX port: {} (rx: {}, tx: {}) rxq: {} txq: {}",
+            self.rx_port.mac_address(),
+            self.tx_port.mac_address(),
+            self.rx_port_id,
+            self.tx_port_id,
             self.rxq,
             self.txq
         )
     }
 }
 
-/// Represents a single RX/TX queue pair for a port. This is what is needed to send or receive traffic.
+/// Represents a single RX/TX queue pair for a port (or multiple ports).
+/// This is what is needed to send or receive traffic.
 impl PortQueue {
     #[inline]
     fn send_queue(&self, queue: i32, pkts: *mut *mut MBuf, to_send: i32) -> Result<u32> {
         unsafe {
-            let sent = zcsi::send_pkts(self.port_id, queue, pkts, to_send);
+            let sent = zcsi::send_pkts(self.tx_port_id, queue, pkts, to_send);
             let update = self.stats_tx.stats.load(Ordering::Relaxed) + sent as usize;
             self.stats_tx.stats.store(update, Ordering::Relaxed);
             Ok(sent as u32)
@@ -99,7 +104,7 @@ impl PortQueue {
     #[inline]
     fn recv_queue(&self, queue: i32, pkts: *mut *mut MBuf, to_recv: i32) -> Result<u32> {
         unsafe {
-            let recv = zcsi::recv_pkts(self.port_id, queue, pkts, to_recv);
+            let recv = zcsi::recv_pkts(self.rx_port_id, queue, pkts, to_recv);
             let update = self.stats_rx.stats.load(Ordering::Relaxed) + recv as usize;
             self.stats_rx.stats.store(update, Ordering::Relaxed);
             Ok(recv as u32)
@@ -170,25 +175,36 @@ impl PmdPort {
         self.txqs
     }
 
+    pub fn new_port_queue_pair(
+        rx_port: &Arc<PmdPort>,
+        tx_port: &Arc<PmdPort>,
+        rxq: i32,
+        txq: i32,
+    ) -> Result<CacheAligned<PortQueue>> {
+        if rxq > rx_port.rxqs || rxq < 0 {
+            Err(PmdPortError::BadRxQueue(rx_port.port, rxq).into())
+        } else if txq > tx_port.txqs || txq < 0 {
+            Err(PmdPortError::BadTxQueue(tx_port.port, txq).into())
+        } else {
+            Ok(CacheAligned::allocate(PortQueue {
+                tx_port: tx_port.clone(),
+                rx_port: rx_port.clone(),
+                txq,
+                rxq,
+                tx_port_id: tx_port.port,
+                rx_port_id: rx_port.port,
+                stats_rx: rx_port.stats_rx[rxq as usize].clone(),
+                stats_tx: tx_port.stats_tx[txq as usize].clone(),
+            }))
+        }
+    }
+
     pub fn new_queue_pair(
         port: &Arc<PmdPort>,
         rxq: i32,
         txq: i32,
     ) -> Result<CacheAligned<PortQueue>> {
-        if rxq > port.rxqs || rxq < 0 {
-            Err(PmdPortError::BadRxQueue(port.port, rxq).into())
-        } else if txq > port.txqs || txq < 0 {
-            Err(PmdPortError::BadTxQueue(port.port, txq).into())
-        } else {
-            Ok(CacheAligned::allocate(PortQueue {
-                port: port.clone(),
-                port_id: port.port,
-                txq,
-                rxq,
-                stats_rx: port.stats_rx[rxq as usize].clone(),
-                stats_tx: port.stats_tx[txq as usize].clone(),
-            }))
-        }
+        PmdPort::new_port_queue_pair(&port, &port, rxq, txq)
     }
 
     /// Current port ID.
@@ -197,13 +213,18 @@ impl PmdPort {
         self.port
     }
 
-    /// Get stats for an RX/TX queue pair.
-    pub fn stats(&self, queue: i32) -> (usize, usize) {
+    /// Get stats for an RX queue.
+    #[inline]
+    pub fn stats_rx(&self, queue: i32) -> usize {
         let idx = queue as usize;
-        (
-            self.stats_rx[idx].stats.load(Ordering::Relaxed),
-            self.stats_tx[idx].stats.load(Ordering::Relaxed),
-        )
+        self.stats_rx[idx].stats.load(Ordering::Relaxed)
+    }
+
+    /// Get stats for a TX queue.
+    #[inline]
+    pub fn stats_tx(&self, queue: i32) -> usize {
+        let idx = queue as usize;
+        self.stats_tx[idx].stats.load(Ordering::Relaxed)
     }
 
     /// Create a PMD port with a given number of RX and TXQs.
@@ -264,7 +285,7 @@ impl PmdPort {
     #[inline]
     pub fn print_port_stats(&self, extended: bool) {
         unsafe {
-            print_stats(self.port, extended as i32);
+            zcsi::print_stats(self.port, extended as i32);
         };
     }
 
