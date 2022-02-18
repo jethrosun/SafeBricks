@@ -217,6 +217,7 @@ fn main() -> PktResult<()> {
     let mut runtime = Runtime::init(&configuration)?;
 
     let main_port_name = &configuration.ports[0].name; // get this hostio core's port name
+    println!("DEBUG main port name: {}", main_port_name);
     let main_port = runtime.context.ports.get(main_port_name).unwrap().clone();
 
     // we can reuse the ports/queues get from the only port as multiple rings connecting to different enclaves.
@@ -225,6 +226,7 @@ fn main() -> PktResult<()> {
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
         ports.extend(queue_vec.iter().cloned());
     }
+    println!("DEBUG ports: {:?}", ports);
 
     let core_ids = core_affinity::get_core_ids().unwrap();
     println!(
