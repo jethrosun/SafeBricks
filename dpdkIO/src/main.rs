@@ -203,6 +203,20 @@ where
     Ok(pkt_count_from_nic.iter().sum())
 }
 
+pub fn forward_ports(ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligned<PortQueue>> {
+    let port0 = ports.pop().unwrap();
+    let port1 = ports.pop().unwrap();
+
+    std::mem::swap(port0.tx_port.mac_address(), port1.tx_port.mac_address());
+    std::mem::swap(port0.tx_port_id, port1.tx_port_id);
+    std::mem::swap(port0.txq, port1.txq);
+
+    let mut forward_ports: Vec<CacheAligned<PortQueue>> = Vec::new();
+    forward_ports.push(port0);
+    forwards_ports.push(port1);
+    forward_ports
+}
+
 fn main() -> PktResult<()> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
@@ -226,6 +240,7 @@ fn main() -> PktResult<()> {
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
         ports.extend(queue_vec.iter().cloned());
     }
+    let ports = forward_ports(ports);
 
     let core_ids = core_affinity::get_core_ids().unwrap();
     println!(
