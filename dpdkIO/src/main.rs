@@ -224,10 +224,8 @@ fn main() -> PktResult<()> {
     let mut ports: Vec<CacheAligned<PortQueue>> = Vec::new();
     //  = runtime.context.rx_queues.get(&0).unwrap().clone(); // get this hostio core's queues.
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
+        println!("DEBUG core {}, queue_vec {}", core_id, queue_vec);
         ports.extend(queue_vec.iter().cloned());
-    }
-    for port in &ports {
-        println!("DEBUG port: {:?}", port);
     }
 
     let core_ids = core_affinity::get_core_ids().unwrap();
