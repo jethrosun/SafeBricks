@@ -36,7 +36,8 @@ export RUSTFLAGS="-C target-cpu=native"
 # export RUST_BACKTRACE="RUST_BACKTRACE=0 "
 #
 # # We fix the Cargo toolchain
-# declare toolchain=nightly-2020-12-25-x86_64-unknown-linux-gnu
+declare TOOLCHAIN=nightly-2020-05-30-x86_64-unknown-linux-gnu
+declare SGX_TOOLCHAIN=nightly-2020-05-30-x86_64-fortanix-unknown-sgx
 
 DPDK_VER=17.08.1
 DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
@@ -70,18 +71,18 @@ native
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
-    ${CARGO} +${NIGHTLY} build
+    ${CARGO} +${TOOLCHAIN} build
 else
-    ${CARGO} +${NIGHTLY} build --release
+    ${CARGO} +${TOOLCHAIN} build --release
 fi
 popd
 
 # Build custom runner
 pushd sgx-runner
 if [ "$MODE" == "debug" ]; then
-    ${CARGO} +${NIGHTLY} build
+    ${CARGO} +${TOOLCHAIN} build
 else
-    ${CARGO} +${NIGHTLY} build --release
+    ${CARGO} +${TOOLCHAIN} build --release
 fi
 popd
 
@@ -93,9 +94,9 @@ do
     # Build enclave APP
     pushd examples/$TASK
     if [ "$MODE" == "debug" ]; then
-	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
+	${CARGO} +${SGX_TOOLCHAIN} build
     else
-	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
+	${CARGO} +${SGX_TOOLCHAIN} build --release
     fi
     popd
 
