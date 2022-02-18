@@ -21,6 +21,18 @@ echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
 export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
 export RUST_BACKTRACE="RUST_BACKTRACE=0 "
 
+CARGO_PATH="$HOME/.cargo/bin/cargo"
+CARGO_LOC=$(which cargo || true)
+export CARGO=${CARGO_PATH-"${CARGO_LOC}"}
+if [ -z "${CARGO}" ] || [ ! -e "${CARGO}" ]; then
+    echo "Could not find a preinstalled Cargo in PATH. Set CARGO_PATH if necessary."
+    exit 1
+fi
+echo "Using Cargo from ${CARGO}"
+
+# We fix the Cargo toolchain
+declare toolchain=nightly-2020-12-25-x86_64-unknown-linux-gnu
+
 DPDK_VER=17.08.1
 DPDK_HOME="$HOME/dev/tools/dpdk-stable-${DPDK_VER}"
 DPDK_LD_PATH="${DPDK_HOME}/build/lib"
@@ -53,18 +65,18 @@ native
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
-    cargo +${NIGHTLY} build
+    ${CARGO} +${NIGHTLY} build
 else
-    cargo +${NIGHTLY} build --release
+    ${CARGO} +${NIGHTLY} build --release
 fi
 popd
 
 # Build custom runner
 pushd sgx-runner
 if [ "$MODE" == "debug" ]; then
-    cargo +${NIGHTLY} build
+    ${CARGO} +${NIGHTLY} build
 else
-    cargo +${NIGHTLY} build --release
+    ${CARGO} +${NIGHTLY} build --release
 fi
 popd
 
@@ -76,9 +88,9 @@ do
     # Build enclave APP
     pushd examples/$TASK
     if [ "$MODE" == "debug" ]; then
-	cargo +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
+	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
     else
-	cargo +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
+	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
     fi
     popd
 
