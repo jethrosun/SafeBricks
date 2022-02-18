@@ -213,7 +213,7 @@ pub fn forward_ports(ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligned<Po
 
     let mut forward_ports: Vec<CacheAligned<PortQueue>> = Vec::new();
     forward_ports.push(port0);
-    forwards_ports.push(port1);
+    forward_ports.push(port1);
     forward_ports
 }
 
