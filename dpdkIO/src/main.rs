@@ -226,7 +226,9 @@ fn main() -> PktResult<()> {
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
         ports.extend(queue_vec.iter().cloned());
     }
-    println!("DEBUG ports: {:?}", ports);
+    for port in &ports {
+        println!("DEBUG port: {:?}", port);
+    }
 
     let core_ids = core_affinity::get_core_ids().unwrap();
     println!(
