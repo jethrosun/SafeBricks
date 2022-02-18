@@ -203,7 +203,7 @@ where
     Ok(pkt_count_from_nic.iter().sum())
 }
 
-pub fn forward_ports(ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligned<PortQueue>> {
+pub fn forward_ports(mut ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligned<PortQueue>> {
     let mut port0 = ports.pop().unwrap();
     let mut port1 = ports.pop().unwrap();
 
@@ -240,7 +240,7 @@ fn main() -> PktResult<()> {
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
         ports.extend(queue_vec.iter().cloned());
     }
-    let ports = forward_ports(ports);
+    let ports = forward_ports(mut ports);
 
     let core_ids = core_affinity::get_core_ids().unwrap();
     println!(
