@@ -40,5 +40,6 @@ export examples=(
         examples/dpi-ipsec-sha
         examples/monitoring-ipsec-sha
         examples/traversal
+        examples/traversal-ng
         # examples/forward
 )
