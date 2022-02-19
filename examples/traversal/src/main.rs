@@ -64,26 +64,27 @@ where
         })
         .collect();
 
-    println!("Running {} pipelines", pipelines.len()+1);
+    println!("Running {} pipelines", pipelines.len() + 1);
     for pipeline in pipelines {
         // println!("Pipeline: {:?}", pipeline);
         sched.add_task(pipeline).unwrap();
     }
 }
 
-fn traversal(packet: RawPacket) -> Result<Tcp<Ipv4>> {
+fn traversal(packet: RawPacket) -> Result<Ethernet> {
     let mut ethernet = packet.parse::<Ethernet>()?;
     ethernet.swap_addresses();
-    let v4 = ethernet.parse::<Ipv4>()?;
-    let tcp = v4.parse::<Tcp<Ipv4>>()?;
-    let flow = tcp.flow();
-    println!("{}", flow);
-
-    println!("before flow_map");
-    stdout().flush().unwrap();
-
-    let payload = tcp.get_payload();
-    let hash = hash_it(payload);
+    println!("got an ethernet packet");
+    // let v4 = ethernet.parse::<Ipv4>()?;
+    // let tcp = v4.parse::<Tcp<Ipv4>>()?;
+    // let flow = tcp.flow();
+    // println!("{}", flow);
+    //
+    // println!("before flow_map");
+    // stdout().flush().unwrap();
+    //
+    // let payload = tcp.get_payload();
+    // let hash = hash_it(payload);
 
     // no integrity check
     // FLOW_MAP.with(|flow_map| {
@@ -96,18 +97,18 @@ fn traversal(packet: RawPacket) -> Result<Tcp<Ipv4>> {
     // });
 
     // integrity check
-    FLOW_PAYLOAD_MAP.with(|flow_map| {
-        println!("inside flow_map");
-        stdout().flush().unwrap();
-        println!("Flow: {}, Hash: {}", flow, hash);
-        stdout().flush().unwrap();
-        (*flow_map.borrow_mut())
-            .entry(flow)
-            .or_insert(vec![hash])
-            .push(hash);
-    });
+    // FLOW_PAYLOAD_MAP.with(|flow_map| {
+    //     println!("inside flow_map");
+    //     stdout().flush().unwrap();
+    //     println!("Flow: {}, Hash: {}", flow, hash);
+    //     stdout().flush().unwrap();
+    //     (*flow_map.borrow_mut())
+    //         .entry(flow)
+    //         .or_insert(vec![hash])
+    //         .push(hash);
+    // });
 
-    Ok(tcp)
+    Ok(ethernet)
 }
 
 fn main() -> Result<()> {

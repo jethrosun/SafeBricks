@@ -39,6 +39,7 @@ export LD_LIBRARY_PATH="${NATIVE_LIB_PATH}:${DPDK_LD_PATH}:${LD_LIBRARY_PATH}"
 # echo "sudo env PATH=\"$PATH\" LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\" LD_PRELOAD=\"$LD_PRELOAD\" $executable \"$@\""
 
 if [ $# -eq 2 ]; then
+    echo "reading config file.."
     env PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" LD_PRELOAD="$LD_PRELOAD" \
     RUST_BACKTRACE=1 ${TARGET_DIR}/sgx-runner -s ${SGX_TARGET_DIR}/${TASK}.sgxs -f sgx-runner/config_$2core.toml
 else

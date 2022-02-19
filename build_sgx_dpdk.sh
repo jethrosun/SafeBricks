@@ -68,26 +68,24 @@ native () {
 
 native
 
-# Build custom runner
-pushd dpdkIO
-if [ "$MODE" == "debug" ]; then
-    ${CARGO} +${TOOLCHAIN} build
-else
-    ${CARGO} +${TOOLCHAIN} build --release
-fi
-popd
+# # Build custom runner
+# pushd dpdkIO
+# if [ "$MODE" == "debug" ]; then
+#     ${CARGO} +${TOOLCHAIN} build
+# else
+#     ${CARGO} +${TOOLCHAIN} build --release
+# fi
+# popd
+#
+# # Build custom runner
+# pushd sgx-runner
+# if [ "$MODE" == "debug" ]; then
+#     ${CARGO} +${TOOLCHAIN} build
+# else
+#     ${CARGO} +${TOOLCHAIN} build --release
+# fi
+# popd
 
-# Build custom runner
-pushd sgx-runner
-if [ "$MODE" == "debug" ]; then
-    ${CARGO} +${TOOLCHAIN} build
-else
-    ${CARGO} +${TOOLCHAIN} build --release
-fi
-popd
-
-# export HYPERSCAN_ROOT=/usr/local
-# for TASK in dpi-hs
 # for TASK in acl-fw dpi lpm macswap maglev monitoring nat-tcp-v4 acl-fw-ipsec dpi-ipsec lpm-ipsec macswap-ipsec maglev-ipsec monitoring-ipsec nat-tcp-v4-ipsec acl-fw-ipsec-sha dpi-ipsec-sha lpm-ipsec-sha macswap-ipsec-sha maglev-ipsec-sha monitoring-ipsec-sha nat-tcp-v4-ipsec-sha
 for TASK in traversal #forward
 do

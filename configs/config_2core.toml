@@ -7,7 +7,9 @@ cache_size = 32
 duration = 1800
 [[ports]]
   name = "0000:01:00.0"
-  rx_queues = [1]
+  rx_port = "0000:01:00.0"
+  tx_port = "0000:01:00.1"
+  rx_queues = [0]
   tx_queues = [1]
   rxd = 128
   txd = 128
@@ -16,8 +18,10 @@ duration = 1800
   csum = false
 [[ports]]
   name = "0000:01:00.1"
-  rx_queues = [2]
-  tx_queues = [2]
+  rx_port = "0000:01:00.1"
+  tx_port = "0000:01:00.0"
+  rx_queues = [1]
+  tx_queues = [0]
   rxd = 128
   txd = 128
   loopback = false

@@ -1,14 +1,23 @@
 secondary = false
-primary_core = 0
-cores = [0, 1]
+primary_core = 4
+cores = [4, 5]
 strict = false
 pool_size = 1024
 cache_size = 32
 duration = 1800
 [[ports]]
+  name = "0000:01:00.0"
+  rx_queues = [4]
+  tx_queues = [4]
+  rxd = 128
+  txd = 128
+  loopback = false
+  tso = false
+  csum = false
+[[ports]]
   name = "0000:01:00.1"
-  rx_queues = [0, 1]
-  tx_queues = [0, 1]
+  rx_queues = [5]
+  tx_queues = [5]
   rxd = 128
   txd = 128
   loopback = false

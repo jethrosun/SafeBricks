@@ -207,9 +207,14 @@ pub fn forward_ports(mut ports: Vec<CacheAligned<PortQueue>>) -> Vec<CacheAligne
     let mut port0 = ports.pop().unwrap();
     let mut port1 = ports.pop().unwrap();
 
-    std::mem::swap(&mut port0.tx_port.mac_address(), &mut port1.tx_port.mac_address());
-    // std::mem::swap(&mut port0.tx_port_id, &mut port1.tx_port_id);
-    // std::mem::swap(&mut port0.txq, &mut port1.txq);
+    println!(
+        "Swaping {:?} with {:?}",
+        port0.tx_port.mac_address(),
+        port1.tx_port.mac_address()
+    );
+    std::mem::swap(&mut port0.tx_port, &mut port1.tx_port);
+    std::mem::swap(&mut port0.tx_port_id, &mut port1.tx_port_id);
+    std::mem::swap(&mut port0.txq, &mut port1.txq);
 
     let mut forward_ports: Vec<CacheAligned<PortQueue>> = Vec::new();
     forward_ports.push(port0);
@@ -240,7 +245,7 @@ fn main() -> PktResult<()> {
     for (core_id, queue_vec) in runtime.context.rx_queues.iter() {
         ports.extend(queue_vec.iter().cloned());
     }
-    let ports = forward_ports(mut ports);
+    let ports = forward_ports(ports);
 
     let core_ids = core_affinity::get_core_ids().unwrap();
     println!(
