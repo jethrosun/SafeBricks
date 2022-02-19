@@ -56,10 +56,10 @@ pub struct PortQueue {
     pub tx_port: Arc<PmdPort>,
     stats_rx: Arc<CacheAligned<PortStats>>,
     stats_tx: Arc<CacheAligned<PortStats>>,
-    rx_port_id: i32,
-    tx_port_id: i32,
-    txq: i32,
-    rxq: i32,
+    pub rx_port_id: i32,
+    pub tx_port_id: i32,
+    pub txq: i32,
+    pub rxq: i32,
 }
 
 impl Drop for PmdPort {
