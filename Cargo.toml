@@ -42,9 +42,9 @@ members = [
     # "examples/nat-tcp-v4-ipsec-sha",
     # "examples/monitoring-ipsec-sha",
     # for sgx
-    "sgx-runner",
     "dpdkIO",
-    "sharedring",
+    "sgx-runner",
+    # "sharedring",
     # auditing
     # "examples/traversal",
     # "examples/traversal-ng",

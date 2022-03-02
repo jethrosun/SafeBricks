@@ -7,16 +7,19 @@ links = "mapping"
 build = "build.rs"
 
 [dependencies]
-nix = "=0.13"
+pktpuller = {version = "0.3.0", path = "../framework-outside"}
+sharedring = { version = "0.1.0", path = "../sharedring" }
+
 aesm-client = { version = "0.1.0", path = "../rust-sgx/aesm-client", features = ["sgxs"]}
 enclave-runner = { version = "0.1.1", path = "../rust-sgx/enclave-runner"}
 sgxs-loaders = { version = "0.1.0", path = "../rust-sgx/sgxs-loaders"}
+
+nix = "=0.13"
 byteorder = "=1.2"
 libc = "=0.2"
 core_affinity = "=0.5"
 lazy_static = "=1.4"
 ctrlc = { version = "=3.1.2", features = ["termination"] }
-sharedring = { version = "0.1.0", path = "../sharedring" }
 clap = "=2.33"
 config = "=0.9"
 serde = "=1.0"

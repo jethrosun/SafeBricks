@@ -68,6 +68,22 @@ native () {
 
 native
 
+pushd framework-inside
+if [ "$MODE" == "debug" ]; then
+    ${CARGO} +${TOOLCHAIN} build
+else
+    ${CARGO} +${TOOLCHAIN} build --release
+fi
+popd
+
+pushd framework-outside
+if [ "$MODE" == "debug" ]; then
+    ${CARGO} +${TOOLCHAIN} build
+else
+    ${CARGO} +${TOOLCHAIN} build --release
+fi
+popd
+
 # Build custom runner
 pushd dpdkIO
 if [ "$MODE" == "debug" ]; then
