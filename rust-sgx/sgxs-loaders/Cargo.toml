@@ -22,12 +22,12 @@ categories = ["os", "hardware-support", "api-bindings"]
 "sgx-isa" = { version = "0.3.0", path = "../sgx-isa" }
 
 # External dependencies
-bitflags = "1"           # MIT/Apache-2.0
+bitflags = "=1"           # MIT/Apache-2.0
 nix = "=0.13"             # MIT
-libc = "0.2"             # MIT/Apache-2.0
-failure = "0.1.1"        # MIT/Apache-2.0
-failure_derive = "0.1.1" # MIT/Apache-2.0
-libloading = "0.5"       # ISC
+libc = "=0.2"             # MIT/Apache-2.0
+failure = "=0.1"        # MIT/Apache-2.0
+failure_derive = "=0.1" # MIT/Apache-2.0
+libloading = "=0.5"       # ISC
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3.7", features = ["enclaveapi","memoryapi"] }

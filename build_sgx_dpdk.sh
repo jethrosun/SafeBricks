@@ -86,21 +86,21 @@ else
 fi
 popd
 
-for TASK in traversal traversal-ng
-do
-    # Build enclave APP
-    pushd examples/$TASK
-    if [ "$MODE" == "debug" ]; then
-	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
-    else
-	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
-    fi
-    popd
-
-    # Convert the APP
-    if [ "$MODE" == "debug" ]; then # 2a
-	ftxsgx-elf2sgxs ${TARGET_DIR}/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2 --debug
-    else
-	ftxsgx-elf2sgxs ${TARGET_DIR}/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2
-    fi
-done
+# for TASK in traversal traversal-ng
+# do
+#     # Build enclave APP
+#     pushd examples/$TASK
+#     if [ "$MODE" == "debug" ]; then
+# 	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx
+#     else
+# 	${CARGO} +${NIGHTLY} build --target=x86_64-fortanix-unknown-sgx --release
+#     fi
+#     popd
+#
+#     # Convert the APP
+#     if [ "$MODE" == "debug" ]; then # 2a
+# 	ftxsgx-elf2sgxs ${TARGET_DIR}/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2 --debug
+#     else
+# 	ftxsgx-elf2sgxs ${TARGET_DIR}/$MODE/$TASK --heap-size 0x5d80000 --stack-size 0x5d80000 --threads 2
+#     fi
+# done
