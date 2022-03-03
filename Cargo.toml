@@ -44,9 +44,9 @@ members = [
     # for sgx
     "dpdkIO",
     "sgx-runner",
-    # "sharedring",
+    "sharedring",
     # auditing
-    # "examples/traversal",
+    "examples/traversal",
     # "examples/traversal-ng",
     # "examples/forward",
 ]
