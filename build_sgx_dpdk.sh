@@ -32,9 +32,9 @@ export RUSTFLAGS="-C target-cpu=native"
 # echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
 #
 # # just enforce it
-# export CARGO_INCREMENTAL="CARGO_INCREMENTAL=0 "
-# export RUST_BACKTRACE="RUST_BACKTRACE=0 "
-#
+export CARGO_INCREMENTAL="CARGO_INCREMENTAL=1 "
+export RUST_BACKTRACE="RUST_BACKTRACE=0 "
+
 # # We fix the Cargo toolchain
 declare TOOLCHAIN=nightly-2020-05-30-x86_64-unknown-linux-gnu
 # declare SGX_TOOLCHAIN=nightly-2020-05-30-x86_64-fortanix-unknown-sgx

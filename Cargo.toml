@@ -55,6 +55,7 @@ exclude = ["rust-sgx", "mbedtls-0.3.0"]
 [profile.release]
 opt-level = 3
 lto = true
+incremental = true
 rpath = true
 debug = true
 debug-assertions = false
