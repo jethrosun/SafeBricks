@@ -27,16 +27,18 @@ export RUSTFLAGS="-C target-cpu=native"
 # if [[ -z ${RUST_BACKTRACE} ]] || [[ RUST_BACKTRACE = true ]] || [[ RUST_BACKTRACE = 1 ]]; then
 #     export RUST_BACKTRACE="RUST_BACKTRACE=1 "
 # fi
-#
-# echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
-# echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
-#
-# # just enforce it
+
+# just enforce it
 export CARGO_INCREMENTAL="CARGO_INCREMENTAL=1 "
 export RUST_BACKTRACE="RUST_BACKTRACE=0 "
 
-# # We fix the Cargo toolchain
-declare TOOLCHAIN=nightly-2020-05-30-x86_64-unknown-linux-gnu
+echo "Current Cargo Incremental Setting: ${CARGO_INCREMENTAL}"
+echo "Current Rust Backtrace Setting: ${RUST_BACKTRACE}"
+
+# We fix the Cargo toolchain
+# declare TOOLCHAIN=nightly-x86_64-unknown-linux-gnu
+# declare TOOLCHAIN=nightly-2020-05-30-x86_64-unknown-linux-gnu
+declare TOOLCHAIN=nightly-2021-02-20-x86_64-unknown-linux-gnu
 # declare SGX_TOOLCHAIN=nightly-2020-05-30-x86_64-fortanix-unknown-sgx
 
 DPDK_VER=17.08.1

@@ -5,7 +5,7 @@
 #![feature(asm)]
 #![feature(llvm_asm)]
 #![feature(box_syntax)]
-#![feature(const_fn)]
+// #![feature(const_fn)]
 // FIXME: Figure out if this is really the right thing here.
 #![feature(ptr_internals)]
 #![feature(specialization)]
